@@ -2,9 +2,13 @@
 <html lang="en"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Red Flag Run</title>
+<!-- Weekly cases: put your live site here, e.g. https://redflag.vercel.app/content/fresh.json
+     Leave empty to use the copy bundled in assets/content/fresh.json -->
+<meta name="rfr-content" content="">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=Instrument+Sans:wght@400..700&family=IBM+Plex+Mono:wght@500;600&display=swap">
-<style>:root{color-scheme:light}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}</style>
+<style>:root{color-scheme:light}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
 <style>
 /* Layout: case-file dossiers, not a game map. Sticky status strip (rank, streak, shields, daily ring), Android-style bottom nav; lessons are full-screen with a fixed verdict bar. */
 :root{
@@ -97,6 +101,9 @@ a{color:var(--ink-2)}
 .case.sealed{background:transparent;border-style:dashed;color:var(--muted);cursor:not-allowed}
 .case.sealed .stamp{border:0;transform:none;padding:0}
 .case.sealed .stamp svg{width:18px;height:18px;display:block}
+
+.dossier.fresh .dos-h{border-bottom-color:var(--signal)}
+.new-badge{font-family:var(--mono);font-size:.68rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;background:var(--tape);color:var(--tape-ink);padding:3px 8px;border-radius:4px}
 
 /* Bottom nav */
 .nav{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);
@@ -448,6 +455,40 @@ const SOURCES = [
  ["CISA/NSA/FBI on Volt Typhoon (ABC7)","https://abc7.com/chinese-hackers-spent-up-to-5-years-in-us-networks-cyber-officials/14400555/"]
 ];
 
+/* ---------- Weekly cases: content/fresh.json, reviewed through a pull request ---------- */
+let FRESH=null;
+function normEx(e){
+ if(!e||typeof e!=="object")return null;
+ const why=String(e.why||"").trim(),flag=String(e.flag||"Red flag").slice(0,40);
+ const src=e.source&&typeof e.source.url==="string"&&/^https:\/\//.test(e.source.url)?[String(e.source.label||"Source"),e.source.url]:null;
+ let x=null;
+ if(e.t==="choice"&&Array.isArray(e.opts)&&e.opts.length>=2&&e.opts.length<=4&&Number.isInteger(e.a)&&e.a>=0&&e.a<e.opts.length)x=C(String(e.q),e.opts.map(String),e.a,why,flag);
+ else if(e.t==="spot"&&e.msg&&typeof e.msg.text==="string"&&typeof e.scam==="boolean")x=P(String(e.msg.ch||"Message"),String(e.msg.from||"Unknown"),e.msg.text,e.scam,why,flag);
+ else if(e.t==="flags"&&Array.isArray(e.segs)&&e.segs.some(g=>g&&g.flag)&&e.segs.some(g=>g&&!g.flag))x={t:"flags",q:String(e.q||"Tap every red flag"),msg:{ch:String(e.msg?.ch||"Message"),from:String(e.msg?.from||"Unknown")},segs:e.segs.map(g=>({text:String(g.text),flag:!!g.flag})),why,flag};
+ else if(e.t==="match"&&Array.isArray(e.pairs)&&e.pairs.length>=3&&e.pairs.length<=5&&e.pairs.every(q=>Array.isArray(q)&&q.length===2))x=M(String(e.q||"Match the pairs"),e.pairs.map(q=>[String(q[0]),String(q[1])]),why);
+ else if(e.t==="order"&&Array.isArray(e.steps)&&e.steps.length>=3&&e.steps.length<=6)x=O(String(e.q),e.steps.map(String),why,flag);
+ if(!x||!why)return null;
+ if(src)x.source=src;
+ return x;
+}
+function installFresh(d){
+ if(!d||!/^\d{4}-\d{2}-\d{2}$/.test(d.week||"")||!Array.isArray(d.lessons))return;
+ const lessons=d.lessons.map(l=>({name:String(l.name||"This week"),ex:(Array.isArray(l.ex)?l.ex:[]).map(normEx).filter(Boolean)})).filter(l=>l.ex.length>=3);
+ if(!lessons.length)return;
+ const id="fresh-"+d.week;
+ UNITS[id]={title:String(d.title||"This week's cases"),sub:String(d.sub||"New scams from the past week"),lessons,fresh:true,week:d.week,
+  audience:Array.isArray(d.audience)&&d.audience.length?d.audience.map(String):["teens","adults","seniors","work"]};
+ THREAT[id]=Math.min(5,Math.max(1,Number(d.threat)||2));
+ FRESH=id;
+}
+async function loadFresh(){
+ const meta=document.querySelector('meta[name="rfr-content"]');
+ const urls=[meta&&meta.content,"content/fresh.json"].filter(Boolean);
+ for(const u of urls){if(FRESH)break;try{const r=await fetch(u,{cache:"no-cache"});if(r.ok)installFresh(await r.json())}catch(e){}}
+ if(!FRESH){const el=document.getElementById("fresh-seed");if(el)try{installFresh(JSON.parse(el.textContent))}catch(e){}}
+ if(FRESH&&S.onboarded&&!R&&tab==="learn"&&!sub&&!document.querySelector(".scrim"))renderHome();
+}
+
 /* ---------- State ---------- */
 const KEY="redflagrun.app.v1";
 const today=()=>{const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
@@ -469,7 +510,7 @@ const pathUnits=()=>AGES[S.age].path;
 const lessonKey=(u,i)=>u+":"+i;
 function allLessons(){const out=[];pathUnits().forEach(u=>UNITS[u].lessons.forEach((l,i)=>out.push({u,i})));return out}
 function currentLesson(){return allLessons().find(l=>!S.done[lessonKey(l.u,l.i)])||null}
-function isUnlocked(u,i){const all=allLessons();const idx=all.findIndex(l=>l.u===u&&l.i===i);return idx===0||!!S.done[lessonKey(all[idx-1].u,all[idx-1].i)]||!!S.done[lessonKey(u,i)]}
+function isUnlocked(u,i){if(UNITS[u]&&UNITS[u].fresh)return true;const all=allLessons();const idx=all.findIndex(l=>l.u===u&&l.i===i);return idx===0||!!S.done[lessonKey(all[idx-1].u,all[idx-1].i)]||!!S.done[lessonKey(u,i)]}
 function vibrate(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
 let actx=null;
 function tone(ok){if(!S.sound)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);const t=actx.currentTime;
@@ -481,7 +522,7 @@ const THREAT={basics:1,game:1,msgs:2,money:2,feeds:3,work:3,ransom:4,nation:5};
 const RANKS=[[0,"Rookie"],[40,"Spotter"],[100,"Analyst"],[180,"Investigator"],[280,"Sentinel"],[400,"Guardian"]];
 function rankOf(xp){let i=0;RANKS.forEach((r,k)=>{if(xp>=r[0])i=k});const nx=RANKS[i+1];return{name:RANKS[i][1],pct:nx?Math.round(100*(xp-RANKS[i][0])/(nx[0]-RANKS[i][0])):100,next:nx?nx[1]:null,need:nx?nx[0]-xp:0}}
 function shields(){return `<span class="shields" role="img" aria-label="${S.hearts} of 5 shields" title="${S.hearts} of 5 shields">${[0,1,2,3,4].map(i=>`<i class="${i<S.hearts?"on":""}"></i>`).join("")}</span>`}
-const caseNo=()=>String(pathUnits().indexOf(R.u)+1).padStart(2,"0")+"-"+(R.li+1);
+const caseNo=()=>UNITS[R.u]&&UNITS[R.u].fresh?"NEW-"+(R.li+1):String(pathUnits().indexOf(R.u)+1).padStart(2,"0")+"-"+(R.li+1);
 
 /* ---------- Icons + mascot ---------- */
 const I={
@@ -575,6 +616,21 @@ function renderHome(){
  app.append(navbar());
 }
 
+function dossierEl(uid,no,cur){
+ const U=UNITS[uid],t=THREAT[uid]||1,fresh=!!U.fresh;
+ const closed=U.lessons.filter((_,li)=>S.done[lessonKey(uid,li)]).length;
+ const when=fresh?new Date(U.week+"T00:00:00").toLocaleDateString(undefined,{day:"numeric",month:"short",year:"numeric"}):"";
+ const sec=h(`<section class="dossier ${fresh?"fresh":""}"><header class="dos-h"><div class="dos-top">${fresh?`<span class="new-badge">New this week</span>`:`<span class="mono">Dossier ${no}</span>`}<span class="threat" role="img" aria-label="Threat level ${t} of 5"><span class="mono">Threat</span>${[1,2,3,4,5].map(i=>`<i class="${i<=t?"on":""}"></i>`).join("")}</span></div><h2>${esc(U.title)}</h2><p>${esc(U.sub)}</p><div class="mono">${fresh?`Week of ${esc(when)} · `:""}${closed} of ${U.lessons.length} case${U.lessons.length===1?"":"s"} closed</div></header><ol class="cases"></ol></section>`);
+ U.lessons.forEach((L,li)=>{
+  const key=lessonKey(uid,li),done=S.done[key],open=isUnlocked(uid,li),isCur=!fresh&&cur&&cur.u===uid&&cur.i===li;
+  const st=done?"closed":open?"open":"sealed";
+  const meta=done?`${L.ex.length} exercises · ${done.acc}% first try`:open?`${L.ex.length} exercises · +10 XP`:"Close the case before to unlock";
+  const item=h(`<li><button class="case ${st} ${isCur?"cur":""}" ${open?"":"disabled"}><span class="case-no">${fresh?"NEW-":no+"-"}${li+1}</span><span class="case-t">${esc(L.name)}<small>${meta}</small></span><span class="stamp">${done?"Closed":open?"Open":I.lock}</span></button></li>`);
+  if(open)item.firstChild.onclick=()=>startLesson(uid,li);
+  sec.querySelector(".cases").append(item);
+ });
+ return sec;
+}
 function renderLearn(){
  const cur=currentLesson();
  if(cur){
@@ -582,22 +638,10 @@ function renderLearn(){
   const card=h(`<section class="next"><div class="tape" aria-hidden="true">RED FLAG · RED FLAG · RED FLAG</div><div class="mono">Next case · ${no}-${cur.i+1}</div><h1>${esc(L.name)}</h1><p>${esc(U.title)}: ${esc(U.sub)}</p></section>`);
   const b=h(`<button class="btn coral">${Object.keys(S.done).length?"Open case":"Start your first case"}</button>`);b.onclick=()=>startLesson(cur.u,cur.i);card.append(b);app.append(card);
  } else {
-  app.append(h(`<section class="next"><div class="mono">All cases closed</div><h1>Every dossier is closed.</h1><p>Keep your streak with Drills, or switch track in Agent for new cases.</p></section>`));
+  app.append(h(`<section class="next"><div class="mono">All cases closed</div><h1>Every dossier is closed.</h1><p>Keep your streak with Drills and new weekly cases, or switch track in Agent.</p></section>`));
  }
- pathUnits().forEach((uid,ui)=>{
-  const U=UNITS[uid],no=String(ui+1).padStart(2,"0"),t=THREAT[uid]||1;
-  const closed=U.lessons.filter((_,li)=>S.done[lessonKey(uid,li)]).length;
-  const sec=h(`<section class="dossier"><header class="dos-h"><div class="dos-top"><span class="mono">Dossier ${no}</span><span class="threat" role="img" aria-label="Threat level ${t} of 5"><span class="mono">Threat</span>${[1,2,3,4,5].map(i=>`<i class="${i<=t?"on":""}"></i>`).join("")}</span></div><h2>${esc(U.title)}</h2><p>${esc(U.sub)}</p><div class="mono">${closed} of ${U.lessons.length} cases closed</div></header><ol class="cases"></ol></section>`);
-  U.lessons.forEach((L,li)=>{
-   const key=lessonKey(uid,li),done=S.done[key],open=isUnlocked(uid,li),isCur=cur&&cur.u===uid&&cur.i===li;
-   const st=done?"closed":open?"open":"sealed";
-   const meta=done?`${L.ex.length} exercises · ${done.acc}% first try`:open?`${L.ex.length} exercises · +10 XP`:"Close the case before to unlock";
-   const item=h(`<li><button class="case ${st} ${isCur?"cur":""}" ${open?"":"disabled"}><span class="case-no">${no}-${li+1}</span><span class="case-t">${esc(L.name)}<small>${meta}</small></span><span class="stamp">${done?"Closed":open?"Open":I.lock}</span></button></li>`);
-   if(open)item.firstChild.onclick=()=>startLesson(uid,li);
-   sec.querySelector(".cases").append(item);
-  });
-  app.append(sec);
- });
+ if(FRESH&&UNITS[FRESH].audience.includes(S.age))app.append(dossierEl(FRESH,"NEW",cur));
+ pathUnits().forEach((uid,ui)=>app.append(dossierEl(uid,String(ui+1).padStart(2,"0"),cur)));
 }
 
 function renderPractice(){
@@ -717,7 +761,7 @@ function regionExercise(){
  const opts=shuffle([me.short,...others]);
  return C(`You live in ${me.name}. Where do you check or report a scam?`,opts,opts.indexOf(me.short),`In ${me.name}, use ${me.short}. Save it in your phone now. You'll find it any time in the Report tab.`,"Know who to call");
 }
-function prep(ex,id){let base=ex.t==="region"?regionExercise():(ex.sgOnly&&S.region!=="SG"?ex.alt:ex);return Object.assign({},base,{id,src:base===ex?SRCMAP[id]:null})}
+function prep(ex,id){let base=ex.t==="region"?regionExercise():(ex.sgOnly&&S.region!=="SG"?ex.alt:ex);const src=base===ex?(SRCMAP[id]?SRC[SRCMAP[id]]:(ex.source||null)):null;return Object.assign({},base,{id,src})}
 function startLesson(u,li){
  if(!S.team&&S.hearts<=0){outOfHearts();return}
  const ex=UNITS[u].lessons[li].ex.map((e,i)=>prep(e,`${u}:${li}:${i}`));
@@ -821,7 +865,7 @@ function feedback(ok,answerText,foot,isFlags,slips){
  foot.className="footer slide "+(ok?"ok":"no");
  const stamp=ok?(ex.t==="spot"&&ex.a===0?"Scam spotted":ex.t==="spot"?"Cleared":ex.t==="flags"?"All flagged":slips?"Matched":"Correct"):(ex.t==="spot"?"Fooled":"Missed");
  foot.firstChild.innerHTML=`<div class="fb-h"><span class="vstamp">${stamp}</span>${ex.flag?`<span class="fb-flag">${esc(ex.flag)}</span>`:""}</div>
-  <div class="fb-body">${!ok&&answerText&&!isFlags?`<b>Answer:</b> ${esc(answerText)}<br>`:""}${!ok&&isFlags?`<span class="muted">${esc(answerText)}</span><br>`:""}${esc(ex.why)}${ex.src&&SRC[ex.src]?`<div class="small" style="margin-top:6px">Source: <a href="${SRC[ex.src][1]}" target="_blank" rel="noopener">${esc(SRC[ex.src][0])}</a></div>`:""}</div>`;
+  <div class="fb-body">${!ok&&answerText&&!isFlags?`<b>Answer:</b> ${esc(answerText)}<br>`:""}${!ok&&isFlags?`<span class="muted">${esc(answerText)}</span><br>`:""}${esc(ex.why)}${ex.src?`<div class="small" style="margin-top:6px">Source: <a href="${esc(ex.src[1])}" target="_blank" rel="noopener">${esc(ex.src[0])}</a></div>`:""}</div>`;
  const next=h(`<button class="btn ${ok?"":"bad"}">${ok?"Next":"Got it"}</button>`);
  next.onclick=()=>{if(R.mode==="lesson"&&!S.team&&S.hearts<=0&&R.queue.length){outOfHearts();return}R.queue.length?renderEx():finish()};
  foot.firstChild.append(next);next.focus({preventScroll:true});
@@ -881,5 +925,6 @@ window.rfrBack=function(){
 /* ---------- Boot ---------- */
 applyPrefs();
 if(S.onboarded)renderHome();else renderOnboarding();
+loadFresh();
 </script>
 </body></html>

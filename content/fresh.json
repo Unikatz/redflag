@@ -1,0 +1,65 @@
+{
+  "week": "2026-10-31",
+  "title": "This week's cases",
+  "sub": "Fake refunds, fee scares and the hotlines to save",
+  "threat": 2,
+  "audience": ["teens", "adults", "seniors", "work"],
+  "lessons": [
+    {
+      "name": "Hotlines & new tricks",
+      "ex": [
+        {
+          "t": "spot",
+          "msg": {
+            "ch": "Email",
+            "from": "CPF Board <refunds@cpf-gov-sg.com>",
+            "text": "You have excess CPF contributions of $1,284.60 to be refunded. Verify your bank details within 48 hours: cpf-refund-sg.com/claim"
+          },
+          "scam": true,
+          "flag": "Fake refund",
+          "why": "In Aug 2026 the CPF Board warned about phishing emails promising refunds of 'excess' contributions. Fake government refunds are a common trick in every country. Agencies don't ask you to confirm bank details through an email link, so check in the official app or website instead.",
+          "source": { "label": "CPF Board phishing alert, 19 Aug 2026 (ThreatCluster)", "url": "https://threatcluster.io/cluster/urgent-alert-cpf-phishing-scam-targets-singaporeans-c68d47be" }
+        },
+        {
+          "t": "flags",
+          "q": "Tap every red flag in this call",
+          "msg": { "ch": "Phone call (transcript)", "from": "'Insurance customer care'" },
+          "segs": [
+            { "text": "Hello, I'm calling about your insurance policy.", "flag": false },
+            { "text": "A new policy fee of $499 will be deducted automatically tonight.", "flag": true },
+            { "text": "To cancel, I'll transfer you to a bank officer now.", "flag": true },
+            { "text": "Please install this app so we can help you cancel.", "flag": true },
+            { "text": "Thank you for your time.", "flag": false }
+          ],
+          "flag": "Fake fee scare",
+          "why": "Singapore police named 'insurance services' scams as a new type. A caller warns that a fee is about to be charged, then hands you to a fake bank or police officer. Hang up and call your insurer on the number in your policy or their official app.",
+          "source": { "label": "Dollars and Sense: new scam types in Singapore", "url": "https://dollarsandsense.sg/types-new-scams-singaporeans-careful/" }
+        },
+        {
+          "t": "choice",
+          "q": "In 2026 the UK replaced Action Fraud with a new national service. What is it called?",
+          "opts": ["Report Fraud", "Scam Stop UK", "CyberCheck", "Fraud Watch"],
+          "a": 0,
+          "flag": "Know who to call",
+          "why": "Report Fraud, run by the City of London Police, is where people in England, Wales and Northern Ireland now report fraud and cybercrime, at reportfraud.police.uk or 0300 123 2040.",
+          "source": { "label": "techUK: Report Fraud replaces Action Fraud", "url": "https://www.techuk.org/resource/report-fraud-service-replaces-action-fraud-as-uk-s-official-fraud-reporting-portal.html" }
+        },
+        {
+          "t": "choice",
+          "q": "In Malaysia, what happens when you call the 997 scam hotline?",
+          "opts": ["It only gives general advice", "It runs 24 hours and your call counts as a police report", "It's for businesses only", "It charges a small fee"],
+          "a": 1,
+          "flag": "Act fast",
+          "why": "Since September 2025 the National Scam Response Centre's 997 line has run around the clock, and calls are treated as police reports, so banks can move faster to freeze money.",
+          "source": { "label": "RinggitPlus: 997 hotline goes 24 hours", "url": "https://ringgitplus.com/en/blog/personal-finance-news/997-scam-hotline-to-operate-24-hours-calls-treated-as-police-reports-from-sept.html" }
+        },
+        {
+          "t": "match",
+          "q": "Match each country to its scam hotline",
+          "pairs": [["Singapore", "1799"], ["Malaysia", "997"], ["Philippines", "1326"], ["India", "1930"]],
+          "why": "Save your country's number before you need it. The Report tab always shows yours."
+        }
+      ]
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 // Red Flag Run service worker: lets the game open and play offline.
 // Bump VERSION whenever you deploy new content so players get the update.
-const VERSION = "rfr-v0.3.0";
-const CORE = ["/", "/privacy", "/manifest.webmanifest", "/favicon.svg", "/icons/icon-192.png", "/icons/icon-512.png"];
+const VERSION = "rfr-v0.4.0";
+const CORE = ["/", "/privacy", "/manifest.webmanifest", "/favicon.svg", "/icons/icon-192.png", "/icons/icon-512.png", "/content/fresh.json"];
 
 self.addEventListener("install", (e) => {
   e.waitUntil(caches.open(VERSION).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -20,8 +20,8 @@ self.addEventListener("fetch", (e) => {
   if (req.method !== "GET") return;
   const url = new URL(req.url);
   if (url.origin === location.origin) {
-    // Pages: network first so updates show up, cache as fallback when offline.
-    if (req.mode === "navigate") {
+    // Pages and weekly cases: network first so updates show up, cache as fallback when offline.
+    if (req.mode === "navigate" || url.pathname.startsWith("/content/")) {
       e.respondWith(
         fetch(req)
           .then((res) => { const copy = res.clone(); caches.open(VERSION).then((c) => c.put(req, copy)); return res; })

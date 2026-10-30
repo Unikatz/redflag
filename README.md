@@ -12,6 +12,8 @@ Red Flag Run is a free learning game. Players work through short daily *cases* b
 | `privacy.html` | Public privacy policy at `/privacy`, for Google Play |
 | `manifest.webmanifest`, `sw.js`, `icons/`, `favicon.svg` | Make it installable ("Add to Home screen") and playable offline |
 | `vercel.json` | Clean URLs, security headers, caching |
+| `content/fresh.json` | **This week's cases**, refreshed every Saturday by pull request. See `content/README.md` |
+| `scripts/validate-fresh.mjs`, `.github/workflows/` | Automatic checks on weekly content |
 | `android/` | Android Studio project that wraps the game for Google Play. See `android/README.md` |
 
 ## Deploy the website (Vercel)
@@ -21,7 +23,7 @@ Import this repo at **vercel.com → Add New → Project**. Keep the defaults (F
 ## Before going public
 
 - [ ] Replace `hello@[your-domain]` in `index.html`, `privacy.html` and `android/app/src/main/assets/index.html`
-- [ ] Bump `VERSION` in `sw.js` on every content update
+- [ ] Bump `VERSION` in `sw.js` when you change `index.html` (weekly content doesn't need it)
 - [ ] For the first Play Store release (13+), hide the Kids track
 
 ## Content
