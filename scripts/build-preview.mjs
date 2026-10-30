@@ -1,11 +1,15 @@
 #!/usr/bin/env node
 // Builds a single-file test page of the app with a draft content/fresh.json baked in,
 // so the owner can play the new weekly cases before anything is pushed.
-// Usage: node scripts/build-preview.mjs [fresh.json] [out.html]
+// Usage: node scripts/build-preview.mjs [fresh.json] [out.html] [--artifact]
+//   --artifact  writes the page body only (title, fonts, styles, content), the format the
+//               Claude Artifact tool expects, which adds its own <html>/<head>/<body> wrapper.
 import { readFileSync, writeFileSync } from "node:fs";
 
-const freshPath = process.argv[2] || "content/fresh.json";
-const out = process.argv[3] || "preview.html";
+const args = process.argv.slice(2).filter((a) => !a.startsWith("--"));
+const artifact = process.argv.includes("--artifact");
+const freshPath = args[0] || "content/fresh.json";
+const out = args[1] || "preview.html";
 
 const fresh = JSON.parse(readFileSync(freshPath, "utf8"));
 let html = readFileSync("index.html", "utf8");
@@ -29,5 +33,12 @@ if (!html.includes('id="fresh-seed"')) {
 // 3. Distinct title so the preview isn't mistaken for the live app.
 html = html.replace(/<title>[^<]*<\/title>/, `<title>Red Flag Run test ${fresh.week}</title>`);
 
+if (artifact) {
+  const title = html.match(/<title>[\s\S]*?<\/title>/)[0];
+  const links = (html.match(/<link rel="(?:preconnect|stylesheet)"[^>]*>/g) || []).join("\n");
+  const styles = (html.match(/<style>[\s\S]*?<\/style>/g) || []).filter((st) => st.includes("--signal")).join("\n");
+  const body = html.match(/<body>([\s\S]*)<\/body>/)[1].trim();
+  html = `${title}\n${links}\n${styles}\n${body}\n`;
+}
 writeFileSync(out, html);
 console.log(`✓ ${out}: test page with draft cases for week ${fresh.week}`);
