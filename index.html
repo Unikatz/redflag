@@ -1,0 +1,900 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Red Flag Run</title>
+<meta name="description" content="Short daily cases that teach you to spot scams, from fake parcel texts to ransomware. Free, no ads, no tracking. For every age, in every country.">
+<meta name="theme-color" content="#EEF1F6" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#0D1120" media="(prefers-color-scheme: dark)">
+<link rel="manifest" href="/manifest.webmanifest">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+<meta property="og:title" content="Red Flag Run">
+<meta property="og:description" content="Short daily cases that teach you to spot scams, from fake parcel texts to ransomware. Free, no ads, no tracking. For every age, in every country.">
+<meta property="og:image" content="/icons/icon-512.png">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@100..125,500..900&family=Instrument+Sans:wght@400..700&family=IBM+Plex+Mono:wght@500;600&display=swap">
+<style>:root{color-scheme:light}body{margin:0;font:14px system-ui}img{max-width:100%}[hidden]{display:none!important}
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}</style>
+<style>
+/* Layout: case-file dossiers, not a game map. Sticky status strip (rank, streak, shields, daily ring), Android-style bottom nav; lessons are full-screen with a fixed verdict bar. */
+:root{
+  --bg:#EEF1F6; --surface:#FFFFFF; --sunk:#E3E8F0; --ink:#161B33; --ink-2:#3346C8; --muted:#5B6380; --line:#CFD6E3;
+  --signal:#FF5A36; --on-signal:#FFFFFF;
+  --safe:#0B9A83; --safe-bg:#DAF2ED; --scam:#E0353A; --scam-bg:#FBE2E2;
+  --amber:#E2A200; --amber-bg:#FFF3CF; --tape:#FFD84D; --tape-ink:#1A1600; --lock:#C7CEDB;
+  --bubble:#E1F5D3; --bubble-ink:#14260F; --hero:#161B33; --hero-ink:#FFFFFF;
+  --coral:var(--signal); --good:var(--safe); --good-bg:var(--safe-bg); --bad:var(--scam); --bad-bg:var(--scam-bg);
+  --sky:var(--ink-2); --sun:var(--amber); --sun-d:var(--amber); --sun-ink:#1A1600; --heart:var(--signal);
+  --display:"Archivo","Arial Narrow",system-ui,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0D1120; --surface:#161B2E; --sunk:#1F2641; --ink:#E7EAF6; --ink-2:#8E9CFF; --muted:#9AA2C0; --line:#2B3352;
+  --signal:#FF6A48; --on-signal:#1A0700; --safe:#2FC7AA; --safe-bg:#0F332D; --scam:#FF5E61; --scam-bg:#3A181D;
+  --amber:#F4C23A; --amber-bg:#3A2F0E; --lock:#2E3757; --bubble:#203B28; --bubble-ink:#DDF3D0; --hero:#242C4D; --hero-ink:#E7EAF6; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0D1120; --surface:#161B2E; --sunk:#1F2641; --ink:#E7EAF6; --ink-2:#8E9CFF; --muted:#9AA2C0; --line:#2B3352;
+  --signal:#FF6A48; --on-signal:#1A0700; --safe:#2FC7AA; --safe-bg:#0F332D; --scam:#FF5E61; --scam-bg:#3A181D;
+  --amber:#F4C23A; --amber-bg:#3A2F0E; --lock:#2E3757; --bubble:#203B28; --bubble-ink:#DDF3D0; --hero:#242C4D; --hero-ink:#E7EAF6; color-scheme:dark}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{font-size:16px} html.large{font-size:19px}
+html,body{background:var(--bg)}
+body{color:var(--ink);font-family:var(--body);font-size:1rem;line-height:1.5;font-weight:500;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:0}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--bg)}
+.app{max-width:540px;margin:0 auto;padding-bottom:110px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none}
+button:focus-visible,a:focus-visible,select:focus-visible,input:focus-visible{outline:3px solid var(--signal);outline-offset:2px}
+h1,h2,h3{font-family:var(--display);font-stretch:118%;font-weight:800;letter-spacing:-.01em;line-height:1.05;margin:0;text-wrap:balance}
+a{color:var(--ink-2)}
+.mono{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+
+/* Buttons: flat pills */
+.btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;min-height:52px;padding:.8rem 1.2rem;border-radius:999px;font-weight:700;font-size:1.02rem;background:var(--ink);color:var(--bg);transition:transform .08s}
+.btn:active:not([disabled]){transform:scale(.98)}
+.btn[disabled]{background:var(--sunk);color:var(--muted);cursor:default}
+.btn.coral{background:var(--signal);color:var(--on-signal)}
+.btn.sky{background:var(--ink);color:var(--bg)}
+.btn.bad{background:var(--scam);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border:2px solid var(--line)}
+.stack{display:grid;gap:12px}
+
+/* Status strip */
+.topbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);display:flex;align-items:center;gap:8px;padding-block:10px;border-bottom:1px solid var(--line)}
+.pill{display:inline-flex;align-items:center;gap:4px;font-family:var(--mono);font-weight:600;font-size:.85rem;padding:4px 4px;border-radius:8px;font-variant-numeric:tabular-nums;white-space:nowrap}
+.pill svg{width:18px;height:18px;flex:none}
+.pill.region{font-family:var(--body);font-size:1.25rem;padding:2px 2px}
+.pill.streak{color:var(--signal)}
+.pill.mode{background:var(--ink);color:var(--bg);font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;padding:5px 8px}
+.rank{flex:1;min-width:0;display:grid;gap:4px}
+.rank-l{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rank-bar{display:block;height:5px;border-radius:3px;background:var(--sunk);overflow:hidden;max-width:120px}
+.rank-bar i{display:block;height:100%;background:var(--amber)}
+.shields{display:inline-flex;gap:3px;align-items:center;padding:4px 2px}
+.shields i{width:7px;height:16px;border-radius:2px 2px 5px 5px;background:var(--lock)}
+.shields i.on{background:var(--signal)}
+.ring{width:24px;height:24px}
+
+/* Next case */
+.next{margin-top:18px;background:var(--hero);color:var(--hero-ink);border:1px solid var(--line);border-radius:22px;padding:18px;display:grid;gap:10px;position:relative;overflow:hidden}
+.next .mono{color:inherit;opacity:.7;padding-right:96px}
+.next h1{font-size:1.9rem}
+.next p{margin:0;opacity:.78}
+.tape{position:absolute;top:16px;right:-46px;transform:rotate(28deg);background:var(--tape);color:var(--tape-ink);font-family:var(--mono);font-size:.62rem;font-weight:600;letter-spacing:.14em;padding:3px 46px;white-space:nowrap;pointer-events:none}
+
+/* Dossiers */
+.dossier{margin-top:24px}
+.dos-h{display:grid;gap:4px;padding:0 2px 10px;border-bottom:2px solid var(--ink)}
+.dos-top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.dos-h h2{font-size:1.45rem}
+.dos-h p{margin:0;color:var(--muted)}
+.threat{display:inline-flex;align-items:center;gap:3px}
+.threat .mono{margin-right:4px}
+.threat i{width:12px;height:6px;border-radius:2px;background:var(--lock)}
+.threat i.on{background:var(--signal)}
+.cases{list-style:none;margin:10px 0 0;padding:0;display:grid;gap:8px}
+.case{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center;text-align:left;padding:12px 14px;border-radius:14px;background:var(--surface);border:1px solid var(--line);transition:transform .08s}
+.case:active:not([disabled]){transform:scale(.99)}
+.case-no{font-family:var(--mono);font-weight:600;font-size:.82rem;color:var(--muted);font-variant-numeric:tabular-nums;min-width:2.6rem}
+.case-t{min-width:0;font-weight:700;line-height:1.25}
+.case-t small{display:block;font-weight:500;font-size:.82rem;color:var(--muted);margin-top:2px}
+.stamp{font-family:var(--mono);font-size:.66rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;padding:4px 8px;border:1.5px solid currentColor;border-radius:6px;transform:rotate(-4deg);white-space:nowrap}
+.case.closed .stamp{color:var(--safe)}
+.case.open .stamp{color:var(--signal)}
+.case.cur{border-color:var(--signal);box-shadow:inset 0 0 0 1px var(--signal),0 0 0 4px color-mix(in srgb,var(--signal) 14%,transparent)}
+.case.sealed{background:transparent;border-style:dashed;color:var(--muted);cursor:not-allowed}
+.case.sealed .stamp{border:0;transform:none;padding:0}
+.case.sealed .stamp svg{width:18px;height:18px;display:block}
+
+/* Bottom nav */
+.nav{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);
+  display:flex;justify-content:center;padding:6px max(16px,env(safe-area-inset-right,0px)) calc(6px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.nav-in{display:flex;gap:4px;width:100%;max-width:540px}
+.nav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:4px 2px;font-size:.75rem;font-weight:600;color:var(--muted)}
+.nav .ic{display:grid;place-items:center;width:56px;height:30px;border-radius:999px;transition:background .15s}
+.nav svg{width:22px;height:22px}
+.nav button[aria-current="page"]{color:var(--ink)}
+.nav button[aria-current="page"] .ic{background:color-mix(in srgb,var(--signal) 18%,transparent);color:var(--signal)}
+
+/* Panels */
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px}
+.section-h{font-size:1.4rem;margin:22px 0 10px}
+.muted{color:var(--muted)} .small{font-size:.88rem}
+.row{display:flex;gap:12px;align-items:center}
+.row > div{min-width:0}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stat{border:1px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;gap:10px;align-items:center;background:var(--surface)}
+.stat svg{width:24px;height:24px;flex:none}
+.stat b{display:block;font-family:var(--display);font-stretch:112%;font-size:1.25rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.78rem;color:var(--muted)}
+.setting{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--line)}
+.setting:last-child{border-bottom:0}
+select{font:inherit;font-weight:600;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:10px;padding:6px 8px;max-width:58%}
+.switch{width:50px;height:28px;border-radius:999px;background:var(--lock);position:relative;flex:none}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:22px;height:22px;border-radius:50%;background:#fff;transition:left .15s}
+.switch[aria-checked="true"]{background:var(--safe)}
+.switch[aria-checked="true"]::after{left:25px}
+.hotline{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--sunk)}
+.hotline > div{min-width:0}
+.hotline b{font-family:var(--mono);font-size:1.4rem;display:block;user-select:all;overflow-wrap:anywhere}
+.copy{font-family:var(--mono);font-weight:600;font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink);border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px;flex:none}
+.steps{margin:0;padding-left:1.3rem;display:grid;gap:6px}
+
+/* Briefing (onboarding) */
+.ob{display:flex;flex-direction:column;min-height:calc(100svh - 24px);padding-block:18px 24px;gap:18px}
+.ob-head{display:grid;gap:8px}
+.ob-hero{padding-top:12px}
+.ob-hero h1{font-size:clamp(2.1rem,9.5vw,2.9rem);line-height:.98;margin:8px 0 12px}
+.ob-hero p{margin:0;max-width:38ch}
+.handler{display:flex;gap:12px;align-items:flex-start;padding:12px 14px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+.handler svg{flex:none}
+.handler p{margin:4px 0 0;font-weight:600}
+.choices{display:grid;gap:8px}
+.choice{display:flex;align-items:center;gap:12px;text-align:left;padding:12px 14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font-weight:700}
+.choice .em{font-size:1.5rem;width:2rem;text-align:center;flex:none}
+.choice > span:nth-child(2){flex:1;min-width:0}
+.choice small{display:block;color:var(--muted);font-weight:500}
+.choice .dot{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:none}
+.choice[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.choice[aria-pressed="true"] .dot{border:6px solid var(--signal)}
+.grid2{grid-template-columns:1fr 1fr}
+
+/* Lesson */
+.lesson-top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--bg);display:flex;align-items:center;gap:12px;padding-block:12px}
+.x{width:36px;height:36px;display:grid;place-items:center;color:var(--muted);border-radius:10px}
+.x svg{width:22px;height:22px}
+.prog{flex:1;display:flex;gap:4px}
+.prog i{flex:1;height:8px;border-radius:2px;background:var(--sunk);transition:background .25s}
+.prog i.on{background:var(--signal)}
+.ob-head .prog i.on{background:var(--ink)}
+.ex-kind{margin:6px 0 8px}
+.ex-q{font-size:1.5rem;line-height:1.15;margin-bottom:16px;font-stretch:110%}
+.practice-tag{font-family:var(--mono);font-size:.72rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--signal)}
+.msg{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;margin-bottom:16px}
+.msg-h{display:flex;justify-content:space-between;gap:8px;font-family:var(--mono);font-size:.72rem;color:var(--muted);margin-bottom:8px}
+.msg-h b{color:var(--ink);min-width:0;overflow-wrap:anywhere}
+.bubble{background:var(--bubble);color:var(--bubble-ink);border-radius:4px 16px 16px 16px;padding:10px 12px;max-width:94%;overflow-wrap:anywhere}
+.opts{display:grid;gap:8px}
+.opt{text-align:left;padding:14px;border:1px solid var(--line);border-radius:14px;background:var(--surface);font-weight:600;display:flex;gap:12px;align-items:flex-start}
+.opt .k{flex:none;width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-family:var(--mono);font-size:.75rem;color:var(--muted)}
+.opt[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.opt[aria-pressed="true"] .k{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.opt.ok{border-color:var(--safe);background:var(--safe-bg);box-shadow:inset 0 0 0 1px var(--safe)}
+.opt.ok .k{background:var(--safe);border-color:var(--safe);color:#fff}
+.opt.no{border-color:var(--scam);background:var(--scam-bg);box-shadow:inset 0 0 0 1px var(--scam)}
+.opt.no .k{background:var(--scam);border-color:var(--scam);color:#fff}
+.duo{grid-template-columns:1fr 1fr}
+.duo .opt{flex-direction:column;align-items:center;text-align:center;padding:18px 10px;gap:6px;font-family:var(--display);font-stretch:118%;font-weight:800;font-size:1.25rem}
+.duo .opt .em{font-size:1.8rem}
+.segs{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-wrap:wrap;gap:8px}
+.seg{text-align:left;padding:8px 10px;border-radius:10px;border:1.5px dashed var(--line);background:var(--bg);line-height:1.35;max-width:100%;overflow-wrap:anywhere}
+.seg[aria-pressed="true"]{border-style:solid;border-color:var(--signal);background:color-mix(in srgb,var(--signal) 14%,var(--surface))}
+.seg.hit{border-style:solid;border-color:var(--safe);background:var(--safe-bg)}
+.seg.miss{border-style:solid;border-color:var(--scam);background:var(--scam-bg)}
+.seg.missed{border-style:solid;border-color:var(--amber);background:var(--amber-bg)}
+.match{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.match .col{display:grid;gap:8px;align-content:start}
+.tile{padding:12px 10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600;font-size:.92rem;line-height:1.25;min-height:58px;text-align:center}
+.tile[aria-pressed="true"]{border-color:var(--ink);box-shadow:inset 0 0 0 1px var(--ink)}
+.tile.matched{opacity:.35;cursor:default}
+.tile.shake{border-color:var(--scam);animation:shake .3s}
+@keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.answer-row{min-height:64px;border-bottom:1px dashed var(--line);display:grid;gap:8px;padding-bottom:10px;margin-bottom:14px}
+.bank{display:grid;gap:8px}
+.chipbtn{text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-weight:600;display:flex;gap:10px;align-items:center}
+.chipbtn .n{flex:none;width:24px;height:24px;border-radius:6px;background:var(--ink);color:var(--bg);display:grid;place-items:center;font-family:var(--mono);font-size:.78rem}
+.chipbtn.used{visibility:hidden}
+.hint{font-size:.85rem;color:var(--muted);margin:-6px 0 12px}
+
+/* Verdict bar */
+.footer{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);
+  padding:14px max(16px,env(safe-area-inset-right,0px)) calc(14px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.footer-in{max-width:540px;margin:0 auto;display:grid;gap:10px}
+.footer.ok{background:var(--safe-bg);border-top:2px solid var(--safe)}
+.footer.no{background:var(--scam-bg);border-top:2px solid var(--scam)}
+.fb-h{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.vstamp{font-family:var(--display);font-stretch:125%;font-weight:900;font-size:1.1rem;letter-spacing:.04em;text-transform:uppercase;padding:3px 10px;border:2.5px solid currentColor;border-radius:8px;transform:rotate(-3deg);animation:stampIn .3s cubic-bezier(.2,1.5,.4,1)}
+.footer.ok .vstamp{color:var(--safe)} .footer.no .vstamp{color:var(--scam)}
+.fb-flag{font-family:var(--mono);font-size:.7rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;background:var(--tape);color:var(--tape-ink);padding:3px 8px;border-radius:4px}
+.fb-body{font-size:.95rem;max-height:32vh;overflow:auto}
+@keyframes stampIn{from{transform:rotate(-3deg) scale(1.5);opacity:0}to{transform:rotate(-3deg) scale(1);opacity:1}}
+
+/* Case report */
+.done-screen{padding-block:30px 200px;display:grid;gap:18px}
+.big-stamp{justify-self:center;font-family:var(--display);font-stretch:125%;font-weight:900;font-size:clamp(1.6rem,8vw,2.2rem);text-transform:uppercase;letter-spacing:.03em;color:var(--signal);border:4px solid currentColor;border-radius:12px;padding:6px 18px;transform:rotate(-5deg);animation:bigStamp .4s cubic-bezier(.2,1.5,.4,1)}
+.big-stamp.perfect{color:var(--safe)}
+@keyframes bigStamp{from{transform:rotate(-5deg) scale(1.7);opacity:0}to{transform:rotate(-5deg) scale(1);opacity:1}}
+.report{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;display:grid;gap:8px}
+.report-h{display:flex;gap:12px;align-items:center}
+.report-h b{display:block;font-family:var(--display);font-stretch:112%;font-size:1.2rem;line-height:1.15}
+.rows{margin:0;display:grid}
+.rows div{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-top:1px dashed var(--line)}
+.rows dt{color:var(--muted)} .rows dd{margin:0;font-family:var(--mono);font-weight:600;font-variant-numeric:tabular-nums}
+.done-notes{display:grid;gap:4px;text-align:center}
+
+/* Certificate */
+.field{font:inherit;font-weight:600;color:var(--ink);background:var(--sunk);border:1px solid var(--line);border-radius:12px;padding:10px 12px;width:100%}
+.cert{position:relative;overflow:hidden;margin-top:14px;background:var(--surface);border:2px solid var(--ink);border-radius:18px;padding:20px 18px;display:grid;gap:10px}
+.cert::before{content:"";position:absolute;inset:7px;border:1px dashed var(--line);border-radius:12px;pointer-events:none}
+.cert-top{display:flex;align-items:center;gap:10px}
+.cert-brand{font-family:var(--display);font-stretch:118%;font-weight:800;font-size:1.3rem;color:var(--signal)}
+.cert-kicker,.cert-label{font-family:var(--mono);font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.cert-label{margin-top:6px}
+.cert-name{font-family:var(--display);font-stretch:118%;font-weight:800;font-size:2rem;line-height:1.05;overflow-wrap:anywhere}
+.cert-org{font-weight:700;color:var(--muted)}
+.cert-body{margin:0}
+.cert-meta{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;border-top:1px solid var(--line);padding-top:10px}
+.cert-meta span{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.cert-meta b{font-variant-numeric:tabular-nums;font-size:.95rem}
+.cert .wm{position:absolute;top:44%;left:50%;transform:translate(-50%,-50%) rotate(-18deg);font-family:var(--display);font-stretch:125%;font-weight:900;font-size:3.2rem;color:var(--signal);opacity:.13;pointer-events:none;white-space:nowrap}
+
+/* Sheet */
+.scrim{position:fixed;inset:0;z-index:40;background:rgba(8,11,24,.6);display:flex;align-items:flex-end;justify-content:center}
+.sheet{background:var(--surface);width:100%;max-width:540px;border-radius:22px 22px 0 0;padding:22px max(18px,env(safe-area-inset-left,0px)) calc(22px + env(safe-area-inset-bottom,0px));display:grid;gap:12px;text-align:center;justify-items:center}
+.sheet h2{font-size:1.4rem}
+
+.pop{animation:pop .3s ease}
+@keyframes pop{0%{transform:scale(.92);opacity:.4}100%{transform:scale(1);opacity:1}}
+.slide{animation:slide .22s ease-out}
+@keyframes slide{from{transform:translateY(24px);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+@media (max-width:380px){.ex-q{font-size:1.3rem}.tile{font-size:.85rem}.rank-l{font-size:.85rem}}
+</style>
+</head><body>
+<div class="app" id="app"></div>
+
+<script>
+/* =====================================================================
+   Red Flag Run — MVP
+   Vision: cyber security awareness for everyone, regardless of age and where you are.
+   Content verified against public sources as of 29 Oct 2026 (see SOURCES).
+   ===================================================================== */
+
+/* ---------- Regions: official reporting channels ---------- */
+const REGIONS = {
+  SG:{name:"Singapore",flag:"🇸🇬",emergency:"999",short:"ScamShield Helpline 1799",lines:[{label:"ScamShield Helpline (check or report)",value:"1799"}],links:[{label:"scamshield.gov.sg",url:"https://www.scamshield.gov.sg/"}]},
+  MY:{name:"Malaysia",flag:"🇲🇾",emergency:"999",short:"NSRC hotline 997",lines:[{label:"National Scam Response Centre (24 hours)",value:"997"}],links:[{label:"malaysia.gov.my: NSRC 997",url:"https://www.malaysia.gov.my/en/topics/nsrc-997-hotline"}]},
+  PH:{name:"Philippines",flag:"🇵🇭",emergency:"911",short:"CICC hotline 1326",lines:[{label:"CICC Inter-Agency Response Center",value:"1326"}],links:[{label:"ABS-CBN: report scams to 1326",url:"https://abs-cbn.com/business/2024/11/10/cicc-report-scams-to-government-instead-of-ranting-on-social-media-951"}]},
+  IN:{name:"India",flag:"🇮🇳",emergency:"112",short:"Cyber Crime Helpline 1930",lines:[{label:"National Cyber Crime Helpline",value:"1930"}],links:[{label:"cybercrime.gov.in",url:"https://cybercrime.gov.in/"},{label:"Chakshu (report suspicious calls/texts)",url:"https://sancharsaathi.gov.in/sfc/"}]},
+  AU:{name:"Australia",flag:"🇦🇺",emergency:"000",short:"Scamwatch / ReportCyber",lines:[],links:[{label:"scamwatch.gov.au",url:"https://www.scamwatch.gov.au/"},{label:"ReportCyber at cyber.gov.au",url:"https://www.cyber.gov.au/report-and-recover/report"}]},
+  UK:{name:"United Kingdom",flag:"🇬🇧",emergency:"999",short:"Report Fraud 0300 123 2040",lines:[{label:"Report Fraud (England, Wales, NI)",value:"0300 123 2040"},{label:"Forward scam texts to",value:"7726"}],links:[{label:"reportfraud.police.uk",url:"https://www.reportfraud.police.uk/"}],note:"In Scotland, call Police Scotland on 101."},
+  US:{name:"United States",flag:"🇺🇸",emergency:"911",short:"ReportFraud.ftc.gov",lines:[],links:[{label:"ReportFraud.ftc.gov",url:"https://reportfraud.ftc.gov/"},{label:"FBI IC3 (internet crime)",url:"https://www.ic3.gov/"}]},
+  GL:{name:"Somewhere else",flag:"🌍",emergency:"",short:"Your bank and local police",lines:[],links:[],note:"Call your bank on the number printed on your card, then report to your local police. Report the scam account on the app or site where you met it."}
+};
+
+const AGES = {
+  kids:{label:"Kids",sub:"8 to 12",em:"🧒",path:["basics","game","msgs","feeds"]},
+  teens:{label:"Teens",sub:"13 to 17",em:"🎧",path:["basics","msgs","feeds","money","work","ransom","nation"]},
+  adults:{label:"Adults",sub:"18 to 59",em:"💼",path:["basics","msgs","money","work","feeds","ransom","nation"]},
+  seniors:{label:"Seniors",sub:"60 and up",em:"🌿",path:["basics","msgs","money","feeds"],large:true},
+  work:{label:"At work",sub:"Staff training · no shields",em:"🏢",path:["basics","msgs","work","money","feeds","ransom"],team:true}
+};
+
+/* ---------- Exercise builders ---------- */
+const C=(q,opts,a,why,flag)=>({t:"choice",q,opts,a,why,flag});
+const P=(ch,from,text,scam,why,flag)=>({t:"spot",q:"Scam or legit?",msg:{ch,from,text},opts:["Scam","Legit"],a:scam?0:1,why,flag});
+const F=(q,ch,from,segs,why,flag)=>({t:"flags",q,msg:{ch,from},segs:segs.map(s=>({text:s.replace(/^!/,""),flag:s[0]==="!"})),why,flag});
+const M=(q,pairs,why)=>({t:"match",q,pairs,why,flag:"Know the words"});
+const O=(q,steps,why,flag)=>({t:"order",q,steps,why,flag});
+const REGION_Q={t:"region"};
+
+/* ---------- Units ---------- */
+const UNITS = {
+basics:{title:"Cyber Basics",sub:"Passwords, 2FA and safe links",color:"#1FA463",lessons:[
+ {name:"Lock it down",ex:[
+  C("Which password is the strongest?",["Password123!","Fluffy2010","purple-taxi-mango-river","qwerty"],2,"Length beats tricks. Four random words are long and easy to remember, and much harder to crack than a short word with symbols.","Long passphrase"),
+  C("What does 2-step verification (2FA) do?",["Makes your password longer","Asks for a second proof, like a code or app tap, so a stolen password alone isn't enough","Hides your account from hackers","Changes your password every day"],1,"Even if someone steals your password, they still need your phone or app to get in.","Turn on 2FA"),
+  P("Phone call","Unknown number","Hi, this is Ben from YourBank security. We just sent you a code to verify your identity. Can you read it back to me?",true,"No real bank, app or agency will ever ask you to read out a one-time code. That code is the key to your account.","Asks for OTP"),
+  M("Match each tool to what it does",[["Password manager","Stores a unique password for every account"],["2FA","A second proof when you log in"],["Software update","Patches holes attackers use"],["Passphrase","A long password made of random words"]],"These four habits stop most everyday account takeovers."),
+  C("Your phone says an update is ready. Best move?",["Ignore it forever","Install it soon. Updates fix security holes","Only update if the phone is slow","Wait until someone you know gets hacked"],1,"Attackers go after known holes in old software. Updating closes them.","Stay updated")]},
+ {name:"Link sense",ex:[
+  F("Tap every red flag in this email","Email","StreamMax",["!From: billing@streamrnax-support.com","!Dear Customer,","Your last payment didn't go through.","!Update your card within 12 hours or your account will be deleted.","!Fix it here: streammax.account-verify.co","Thanks for watching!"],"Look-alike sender (rn pretending to be m), a generic greeting, a scary deadline and a link to a site that isn't StreamMax's own domain. 'Your payment failed' on its own is normal, so it's the other details that give it away.","Look-alike sender"),
+  C("Which link really goes to mybank.com?",["mybank.com.secure-login.io","secure-mybank.com","mybank.com/login","mybank-com.net"],2,"Read the address up to the first single slash. The real site is the part just before it. 'mybank.com.secure-login.io' actually belongs to secure-login.io.","Read the domain"),
+  P("Official delivery app","Notification","Your parcel arrives today between 2 and 5 pm. Track it in this app.",false,"This one is fine: it's inside the official app you installed and doesn't push you to an outside link or ask for payment.","Inside the real app"),
+  C("What is phishing?",["A fishing game","Tricking you into giving info or clicking by pretending to be someone you trust","A type of computer virus that deletes files","Sending too many emails"],1,"Phishing works by borrowing trust: a bank, a parcel company, a friend or your boss.","Borrowed trust"),
+  C("You're not sure if an alert is real. Safest way to check?",["Tap the link to see","Reply and ask if it's real","Open the official app or type the website yourself","Forward it to all your friends"],2,"Go to the source yourself. If the alert is real, you'll see it there too.","Go to the source")]}
+]},
+
+game:{title:"Game On",sub:"Staying safe while you play",color:"#2F8CE0",lessons:[
+ {name:"Free stuff?",ex:[
+  P("Game chat","xX_ProGiver_Xx","FREE 10,000 gems!! Just log in at gemz-free.win with your game password 😎",true,"Free gems that need your password are a trick to steal your account. Only buy or claim things inside the real game.","Too good to be true"),
+  C("A new online friend asks for your home address and school. You should…",["Tell them, they seem nice","Not share it, and tell a trusted adult","Only share your school","Send a photo instead"],1,"Keep personal details private online. A trusted adult can help you decide what's okay.","Personal info"),
+  C("Who should know your game password?",["Your best friend","Your teammates","Only you, and a parent or guardian","Anyone who asks nicely"],2,"Passwords are like toothbrushes: don't share them. Even good friends can fall out, or get hacked themselves.","Keep it secret"),
+  M("Match the words",[["Username","The name other players see"],["Password","Your secret key, keep it private"],["Trusted adult","Who to tell when something feels off"],["Block","Stops someone from messaging you"]],"Knowing these helps you stay in control online."),
+  P("In-game store","Official store","Gem pack: 500 gems. Ask a parent before you buy.",false,"This is the real store inside the game, and it reminds you to ask a parent. That's the safe way to buy.","Official store")]},
+ {name:"Feels off?",ex:[
+  C("Someone online says ‘Keep our chats a secret from your parents.’ That is…",["Normal for friends","A big red flag. Tell a trusted adult","Fine if they play the same game","A fun secret"],1,"Safe people don't ask you to hide things from your family. Telling an adult is always okay, and you won't be in trouble.","Secret = red flag"),
+  F("Tap every red flag in this message","Game DM","Unknown player",["GG, nice game!","!Congrats, you won a free legendary skin 🎉","!Claim it before midnight","!Send me a photo of your mum's bank card to verify"],"Surprise prizes, a deadline and asking for a card are all scam signs. ‘GG, nice game’ is just friendly.","Prize + deadline"),
+  C("A video says ‘Download this mod for unlimited coins!’ What's the risk?",["None, mods are always safe","It might hide a virus or steal your account","It could make the game faster","It only works on weekends"],1,"Cheat tools from random sites often hide malware. Stick to the official store.","Fake downloads"),
+  O("Something online made you feel weird or scared. Put the steps in order",["Stop chatting","Take a screenshot","Tell a trusted adult","Block and report the account"],"Stop first, save proof, get help, then block so they can't reach you again.","Stop, save, tell"),
+  C("Which password is strong AND easy to remember?",["123456","yourname","rocket-pancake-violet-17","password"],2,"Silly random words are long and memorable, which makes them hard to guess.","Passphrase")]}
+]},
+
+msgs:{title:"Texts & Calls",sub:"Phishing, fake friends and fake officials",color:"#E0412A",lessons:[
+ {name:"Suspicious messages",ex:[
+  P("SMS","+65 8xxx 4417","PostCo: Your parcel is on hold due to an incomplete address. Update within 24 hrs or it will be returned: post-redeliver.top/sg",true,"Delivery firms and governments don't text from random mobile numbers with odd links like .top. The 24-hour deadline is there to rush you.","Urgency + odd link"),
+  P("WhatsApp","Unknown number","Hey it's me, changed number 😅 Can you transfer $300 now? My bank app is jammed, I'll pay you back tonight",true,"Fake-friend scams are common everywhere (Singapore police flagged a rise in May 2026). Call your friend on the number you already have before sending anything.","New number + money"),
+  C("Your ‘mum’ calls crying: she's in trouble and needs money now. Her voice sounds real. What protects you best?",["Ask her to send a selfie","A family safe word agreed in advance, then hang up and call her back","Send a small amount first","Keep her talking longer"],1,"AI can copy a voice from a few seconds of audio. A safe word and a call-back beat a convincing voice.","AI voice clone"),
+  C("A caller says he's from the police: your bank account is linked to a crime, and you must move your money to a ‘safe account’. What do you do?",["Transfer to clear your name","Hang up. Real officers never ask you to move money","Give only your account number","Stay on the line while you check"],1,"Fake officials are among the costliest scams (Singapore alone lost $90.8M to them in the first half of 2026). No real authority asks you to transfer money or keep it secret.","Fake official"),
+  REGION_Q]},
+ {name:"Pressure tactics",ex:[
+  F("Tap every red flag in this SMS","SMS","+65 8xxx 2210",["Alert: a payment of $1,250 was made from your card.","!If this wasn't you, call this number now: +65 8xxx 2210","!Don't hang up or tell anyone, not even branch staff.","Thank you for banking with us."],"Real banks tell you to call the number on your card, not one inside a text. Being told to keep it secret is a classic scam move.","Secrecy"),
+  C("Why do scammers love urgency, like ‘within 24 hours!’?",["They're very busy","Panic stops you from checking","It's the law","It makes messages shorter"],1,"Pressure is the scammer's main tool. When something feels urgent, slow down and check.","Slow down"),
+  M("Match the scam to how it reaches you",[["Phishing","Fake emails"],["Smishing","Fake SMS texts"],["Vishing","Fake phone calls"],["Quishing","Fake QR codes"]],"Same trick, different channel. The rule stays the same: don't act on the message, check at the source."),
+  C("Who should you ever share a one-time password (OTP) with?",["Your bank, if they call","A delivery company","No one, not even someone who says they're the bank","Close friends only"],2,"An OTP is the last lock on your account. Anyone asking for it is trying to get in.","Never share OTP"),
+  P("Bank app","In-app alert","New login on your phone at 21:02. Not you? Tap ‘Secure account’ in this app.",false,"An alert inside your official app, matching something you just did, with no outside link, is the safe pattern.","Inside the real app")]}
+]},
+
+money:{title:"Money Moves",sub:"Shopping, jobs and investment traps",color:"#C9921A",lessons:[
+ {name:"Buy, sell, earn",ex:[
+  C("You're buying concert merch on a marketplace app. Which is the biggest red flag?",["The seller has a few reviews","The seller asks you to pay in full to a personal account, outside the app","The item ships from overseas","The price is in your currency"],1,"Paying outside the platform removes buyer protection. Fan-merch pre-order scams like this are common (Singapore flagged a wave of K-pop cases in Feb 2026).","Pay off-platform"),
+  C("A ‘job’ pays $200 a day to like videos, but first you top up $50 to unlock tasks. What is this?",["A real gig job","A task scam: you pay to earn, then the deposits grow until you can't withdraw","An internship","A bonus scheme"],1,"Real employers pay you. They never ask you to deposit money to start working.","Pay to work"),
+  C("A part-time job pays you to receive money into your bank account and send it on. What are you?",["A payments assistant","A money mule, helping move scam money, which is a crime","A freelancer","A trader"],1,"Lending or selling your bank account or SIM card can get you charged, even if you didn't know the full story.","Money mule"),
+  C("In Singapore in early 2026, how many scam victims sent the money themselves after being tricked?",["1 in 10","3 in 10","8 in 10","Almost none"],2,"Police said about 8 in 10 victims handed money over voluntarily. Scams hack people, not phones.","Social engineering"),
+  O("You realise you just paid a scammer. Put these in order",["Stop all contact with the scammer","Call your bank's official number right away","Report it to the police or scam hotline","Warn friends and family"],"Speed matters: the sooner your bank knows, the better the chance of stopping the transfer.","Act fast")]},
+ {name:"Too good to be true",ex:[
+  C("Someone you met online becomes a close friend, shows you their crypto profits and helps you invest. To withdraw, you must pay a ‘tax fee’. What's this called?",["Phishing","Pig butchering","A rug pull","Smishing"],1,"Scammers ‘fatten’ victims with trust and fake gains before taking everything. Paying to get your own money back is the giveaway.","Fee to withdraw"),
+  P("WhatsApp group","‘Prof. Tan’ VIP Signals","Members made 30% this week! 🚀 Only 5 VIP slots left. Transfer $500 today to join.",true,"Guaranteed big returns, limited slots and pressure to pay now. Many people in these groups are scammers playing happy members.","Guaranteed returns"),
+  C("An ad invites you to ‘free investment lessons’ run by a famous brokerage. Red flag?",["It's free","Scammers copy real brands to borrow their trust","The group is busy","The ad has nice colours"],1,"Scammers pose as universities and well-known trading apps (Singapore police reported both in 2026). Check the brand's official site, not the ad.","Borrowed brand"),
+  C("A sticker QR code on a parking machine says ‘Scan to pay’. Smartest choice?",["Scan it, QR codes are safe","Pay in the official app or at the machine. Stickers can cover real codes","Scan in incognito mode","Scan it twice"],1,"QR phishing hides a fake payment page behind a sticker.","Quishing"),
+  F("Tap every red flag in this marketplace chat","Marketplace chat","Buyer",["Hi, is this still available?","!I'm overseas so I can't meet.","!I'll pay extra for courier, just pay the delivery fee first.","!Use this link: market-securepay.shop","Thanks!"],"Can't meet, asks you to pay a fee to receive money, and a payment link outside the app. Sellers get scammed too.","Fake payment link")]}
+]},
+
+feeds:{title:"Feeds & AI",sub:"Deepfakes, fake giveaways and hijacked accounts",color:"#8E5BD9",lessons:[
+ {name:"Fake but real-looking",ex:[
+  C("A video of a well-known minister promotes a ‘guaranteed’ trading app. The lips look slightly off. Best move?",["Download it, it's a minister","Treat it as a likely deepfake and check official channels","Ask in the comments","Share it so others can decide"],1,"A Singapore retiree lost over $4,000 to a deepfake investment video. Officials don't sell trading apps.","Deepfake"),
+  P("Website pop-up","stream-free.site","Verify you are human: press Win + R, paste the copied code and press Enter.",true,"This is ClickFix, spread through fake streaming ads on Reddit in Sep 2026. It makes you run malware yourself. No real check asks you to run commands.","ClickFix"),
+  C("A verified big-tech account posts about a new crypto token. What's the lesson?",["A blue tick means it's safe","Verified accounts can be hijacked. Judge the offer, not the badge","Only tech tokens are safe","Crypto posts are always ads"],1,"In Oct 2026, attackers hijacked Microsoft's verified account on X to push a token.","Hijacked account"),
+  M("Match the AI-era scam words",[["Deepfake","AI-faked video or face"],["Voice clone","AI copy of someone's voice"],["ClickFix","Fake ‘verify’ that makes you run a command"],["Account takeover","A scammer controls a real account"]],"New tools, old trick: they borrow someone you trust."),
+  C("A page with 2 posts says ‘Comment and DM your address to win the new phone!’ What is it?",["A real giveaway","A fake giveaway to collect your details","A brand survey","A charity"],1,"New pages, huge prizes and requests for personal details are classic fake-giveaway signs.","Fake giveaway")]},
+ {name:"Check before you trust",ex:[
+  P("Instagram DM","Your friend's account","OMG is this you in this video?? 😳 instavid-check.link",true,"Your friend's account was probably taken over. The link steals your login next. Message your friend another way.","Hijacked friend"),
+  C("A friend video-calls asking for money urgently, but something feels off. Best check?",["Send it, you saw their face","Ask something only they'd know, then call back on their usual number","Ask them to blink","Send half"],1,"Real-time deepfakes exist. A personal question and a call-back on a number you trust are hard to fake.","Call back"),
+  F("Tap every red flag in this DM","Instagram DM","brand.collab.official",["!You've been selected as our brand ambassador 🌟","!Free products + $500 a week","!Just pay a $49 starter kit fee to begin","We love your content!"],"Real brand deals pay you. Selected out of nowhere, big pay and a fee to start is the scam pattern.","Pay to join"),
+  C("Which of these is safest NOT to post publicly?",["Your favourite food","Long clear voice clips plus your birthday and school or workplace","A sunset photo","Your pet's name"],1,"Voice clips help scammers clone your voice, and personal details help them pass security questions.","Overshare"),
+  C("A chatbot on a random website offers to ‘fix your bank account’ if you type your login. You…",["Type it, it's AI","Close it. Only log in through your bank's official app","Type only the password","Ask it if it's safe"],1,"Anything asking for your login outside the official app is a trap, whether it's a person or a bot.","Fake helper")]}
+]},
+
+work:{title:"At Work",sub:"Office scams and first-job traps",color:"#2F8CE0",lessons:[
+ {name:"Who's really asking?",ex:[
+  C("Your CFO emails: a supplier changed bank accounts, pay the invoice today. What do you do?",["Pay, it's the CFO","Reply to confirm","Call the CFO or supplier on a number you already have","Forward it to a friend"],2,"This is business email compromise. In Singapore its losses jumped from $19.5M to $57.3M between the first halves of 2025 and 2026. Replying goes to the scammer.","Changed bank details"),
+  P("Authenticator app","Work account","Approve sign-in? (prompt #7 in the last 5 minutes, 02:13 AM)",true,"Someone has your password and is spamming prompts until you tap Approve. Deny, change your password and tell IT.","MFA fatigue"),
+  P("Browser pop-up","Windows Defender Alert","YOUR PC IS INFECTED. Do not shut down. Call Microsoft Support 800-xxx-xxxx now.",true,"Real security software doesn't put phone numbers in pop-ups. Close the tab, or quit the browser if it won't close.","Tech support scam"),
+  C("You find a USB stick labelled ‘Salary 2026’ in the car park. You…",["Plug it in to find the owner","Hand it to IT without plugging it in","Take it home","Plug it into a spare laptop"],1,"Dropped USB sticks are a known way to get malware inside a company.","Mystery USB"),
+  M("Match the office threats",[["BEC","A fake boss or supplier email asking you to pay"],["MFA fatigue","A flood of ‘approve’ prompts"],["Tailgating","Following someone through a secure door"],["Shoulder surfing","Peeking at your screen"]],"Most office attacks target people and habits, not just computers.")]},
+ {name:"Protect the business",ex:[
+  F("Tap every red flag in this email","Email","‘CEO’ <ceo.office@gmail.com>",["!Are you at your desk? I need a quick favour.","!Buy five $100 gift cards for a client.","!Keep this between us, I'm in a meeting.","Sent from my phone"],"An outside email address, gift cards and secrecy. Check with the real person another way.","Gift cards"),
+  C("Your usual supplier is acme-supply.com. A new invoice comes from acme-supp1y.com. What's going on?",["Nothing, same company","A look-alike domain: the ‘l’ became a ‘1’","A new branch","A typo, pay anyway"],1,"Scammers register near-identical domains. Check every letter on payment emails.","Look-alike domain"),
+  C("You want to summarise a confidential client file quickly. Safest choice?",["Paste it into any free AI website","Use only the tools your company has approved","Email it to your personal account","Post it in a group chat"],1,"Pasting company data into unapproved tools can leak it. Use what your organisation has approved.","Data leak"),
+  O("A ‘supplier’ asks you to change their bank details. Put the steps in order",["Pause the payment","Find the supplier's number in your own records","Call them and confirm the change","Only then update and pay"],"Verify using contact details you already trust, never the ones in the request.","Verify first"),
+  C("Why do scammers target new joiners and interns?",["They earn more","They may not know the normal processes yet and want to help quickly","They have admin rights","They work late"],1,"Eagerness to help plus not knowing ‘how we do things here’ is what scammers count on. It's always okay to double-check.","Ask first")]}
+]},
+
+ransom:{title:"Ransom Room",sub:"How ransomware takes down companies",color:"#14251D",lessons:[
+ {name:"Inside an attack",ex:[
+  C("What is ‘double extortion’ ransomware?",["Two ransom notes","Locking files AND stealing data, then threatening to leak it","Attacking two companies","Charging double"],1,"Even if a company restores from backups, the gang threatens to publish what it stole.","Steal + encrypt"),
+  C("Ransomware hit a record high in Q3 2026. Which two gangs led?",["LockBit and REvil","Qilin and The Gentlemen","WannaCry and NotPetya","Lazarus and APT28"],1,"Qilin attacks rose 24% and The Gentlemen 29% on Q2. Clop went from 1 attack to 48.","2026 gangs"),
+  C("Sophos' 2026 survey: where did most ransomware attacks start?",["A user's laptop","An exposed internet-facing application or system","A USB stick","The CEO's phone"],1,"38% started in an exposed application or system and 30% on a user's device. Patching internet-facing systems matters a lot.","Exposed apps"),
+  C("A health centre hit in 2026 recovered without paying. What most likely saved them?",["Negotiating fast","Isolating the server and restoring from backups","Paying in Bitcoin","Turning off Wi-Fi forever"],1,"Offline, tested backups turn a crisis into an outage.","Backups"),
+  C("In July 2026 a ransomware attack on Coca-Cola's Fairlife business did what?",["Leaked recipes only","Halted its US dairy production","Changed prices","Nothing visible"],1,"When the IT that runs production goes down, factories stop. Fairlife's Canadian plants kept running.","Factory stops")]},
+ {name:"Respond and recover",ex:[
+  C("Sophos 2026: average cost to recover from ransomware, not counting the ransom?",["About $17,000","About $170,000","About $1.7 million","About $1.7 billion"],2,"Downtime, rebuilding and lost business add up to about $1.7M on average.","Hidden cost"),
+  O("Your work laptop shows a ransom note. Put the steps in order",["Disconnect it from Wi-Fi and the network","Don't pay or reply to the attackers","Call your IT or security team right away","Write down what you saw and when"],"Contain first so it can't spread, then get the experts in. Leave negotiation to them.","Contain first"),
+  M("Match the attack stages",[["Initial access","How attackers first get in"],["Lateral movement","Spreading to more systems"],["Exfiltration","Stealing data out"],["Encryption","Locking the files"]],"Defenders try to break the chain as early as possible."),
+  C("What is the 3-2-1 backup rule?",["Back up 3 times a day","3 copies, on 2 types of storage, 1 kept offsite or offline","3 passwords, 2 laptops, 1 cloud","Backups every 321 days"],1,"An offline copy can't be encrypted by attackers who get into the network.","3-2-1 backups"),
+  C("Does paying the ransom guarantee you get everything back safely?",["Yes, always","No. Data can still leak and you may be targeted again","Only if you pay in crypto","Only on weekends"],1,"Paying funds the gang and gives no guarantee. That's why backups and fast response matter.","No guarantees")]}
+]},
+
+nation:{title:"Nation State",sub:"Cyber operations between countries",color:"#5A6E64",lessons:[
+ {name:"Quiet invaders",ex:[
+  C("US agencies said China-linked Volt Typhoon sat inside critical infrastructure for up to 5 years. Why?",["To steal credit cards","To be ready to disrupt systems if a crisis or conflict breaks out","To mine crypto","To run ransomware"],1,"CISA, NSA and FBI said the group targeted communications, energy, transport and water, positioning itself rather than seeking quick profit.","Pre-positioning"),
+  C("State hackers often ‘live off the land’. What does that mean?",["Attacking farms","Using the victim's own admin tools so they blend in","Hacking from the countryside","Using only free software"],1,"No obvious malware means fewer alarms. Defenders hunt for unusual behaviour, not just bad files.","Hide in plain sight"),
+  C("‘Harvest now, decrypt later’ is why governments are moving to…",["Delete old emails","Quantum-resistant encryption","Ban VPNs","Buy more hard drives"],1,"Spies collect encrypted data now, betting future quantum computers can crack it.","Quantum future"),
+  C("Salt Typhoon made headlines for breaking into what?",["Game servers","At least nine major telecom providers","Hospital records only","A social media app"],1,"Telecoms carry everyone's calls and texts, so they're prime spying targets.","Telecom spying"),
+  C("Advisories in 2026 warned of state actors targeting PLCs at water and energy sites. What's a PLC?",["A password type","A small industrial computer that controls pumps, valves and machines","A cloud database","A phishing email"],1,"Hack a PLC and you can change physical processes, like water treatment.","Cyber-physical")]},
+ {name:"The bigger picture",ex:[
+  C("In Nov 2025, Anthropic disclosed a state-sponsored espionage campaign. What was new about it?",["It used floppy disks","AI ran about 80 to 90% of the operation with little human help","It only targeted gamers","Antivirus stopped it instantly"],1,"AI handled reconnaissance, exploitation and data theft largely on its own, so defenders expect faster attacks.","AI-run attacks"),
+  M("Match the terms",[["APT","A long-running, well-funded hacking group"],["Zero-day","A flaw the vendor doesn't know about yet"],["Supply-chain attack","Hacking a supplier to reach its customers"],["Critical infrastructure","Power, water, telecoms, transport"]],"These words come up in every major cyber news story."),
+  C("Why might state hackers break into an IT service provider?",["It's easier to find","To reach many of its client companies at once","For free software","To get a job there"],1,"One provider can be a door into hundreds of organisations downstream.","Downstream access"),
+  O("Put the typical stages of a state-backed operation in order",["Reconnaissance","Initial access","Persistence (staying hidden)","Acting on the goal: spy or disrupt"],"State actors are patient. Long hidden phases are why detection matters so much.","Patient attackers"),
+  C("What's one thing everyone can do that helps national cyber defence?",["Nothing, it's only for governments","Keep devices updated and use 2FA, so your accounts and routers can't be easily hijacked","Turn off the internet","Use one password everywhere"],1,"Hijacked home routers and accounts are often used as stepping stones in bigger attacks. Basic hygiene helps everyone.","Basic hygiene")]}
+]}
+};
+
+/* Per-question sources (exercise id -> source key) */
+const SRC={
+ spf:["Singapore Police mid-year scam brief 2026","https://www.police.gov.sg/-/media/SPF/Media-Room/Statistics/Mid-Year-Scam-and-Cybercrime-Brief-2026/Mid-Year-Scam-and-Cybercrime-Brief-2026.pdf"],
+ sgnews:["Asia News Network, 27 Aug 2026","https://asianews.network/?p=297011"],
+ bulletin:["ScamShield monthly bulletins 2026","https://www.scamshield.gov.sg/resources/scam-bulletins/"],
+ stcol:["ScamShield × Straits Times column","https://scamshield.gov.sg/resources/straits-times-column/"],
+ mcafee:["McAfee This Week in Scams, Sep 2026","https://www.mcafee.com/blogs/enterprise/shaping-the-future-of-cybersecurity"],
+ redflag:["The Daily Red Flag #020, 2 Oct 2026","https://buttondown.com/beaware/archive/"],
+ voice:["IsThisAScam April 2026 report","https://isthisascam.to/blog/latest-scams-april-2026"],
+ knowbe4:["KnowBe4: ransomware record Q3 2026","https://blog.knowbe4.com/report-ransomware-attacks-hit-a-record-high-in-q3-2026"],
+ sophos:["Sophos State of Ransomware 2026","https://assets.sophos.com/X24WTUEQ/at/jbww7pmb8n3gp99wr6hfq4/sophos-state-ransomware-report-2026.pdf"],
+ fairlife:["RISI database: Fairlife ransomware 2026","https://www.risidata.com/Database/Detail/fairlife-coca-cola-ransomware-2026"],
+ blackfog:["BlackFog State of Ransomware, May 2026","https://blackfog.com/the-state-of-ransomware-may-2026/"],
+ volt:["CISA/NSA/FBI on Volt Typhoon (ABC7)","https://abc7.com/chinese-hackers-spent-up-to-5-years-in-us-networks-cyber-officials/14400555/"],
+ socradar:["SOCRadar: state-sponsored attacks, May 2026","https://socradar.io/glossary/state-sponsored-cyber-attack/"],
+ rand:["RAND Forecasting Initiative","https://www.randforecastinginitiative.org/questions/1704-will-an-ai-enabled-cyber-attack-attributed-to-a-state-actor-cause-significant-disruption-to-critical-national-infrastructure-in-any-g20-country-before-1-july-2026/"],
+ cyberthreat:["Cyber Threat Monitor","https://www.defconlevel.com/cyber-threats"]
+};
+const SRCMAP={"msgs:0:0":"bulletin","msgs:0:1":"bulletin","msgs:0:2":"voice","msgs:0:3":"sgnews",
+ "money:0:0":"bulletin","money:0:1":"spf","money:0:3":"sgnews","money:1:2":"sgnews",
+ "feeds:0:0":"stcol","feeds:0:1":"mcafee","feeds:0:2":"redflag","work:0:0":"sgnews",
+ "ransom:0:0":"blackfog","ransom:0:1":"knowbe4","ransom:0:2":"sophos","ransom:0:3":"blackfog","ransom:0:4":"fairlife","ransom:1:0":"sophos",
+ "nation:0:0":"volt","nation:0:1":"socradar","nation:0:2":"socradar","nation:0:3":"rand","nation:0:4":"cyberthreat","nation:1:0":"rand","nation:1:2":"socradar"};
+/* Singapore-only statistic: other countries get a neutral version */
+Object.assign(UNITS.money.lessons[0].ex[3],{sgOnly:true,alt:C("Most scam losses happen because…",["Phones get hacked remotely","People are tricked into sending money or details themselves","Banks make mistakes","Public Wi-Fi is unsafe"],1,"Most scams don't break into phones at all. They persuade people to act. In Singapore, for example, police found about 8 in 10 victims sent the money themselves.","Social engineering")});
+
+const SOURCES = [
+ ["Singapore Police mid-year scam brief 2026","https://www.police.gov.sg/-/media/SPF/Media-Room/Statistics/Mid-Year-Scam-and-Cybercrime-Brief-2026/Mid-Year-Scam-and-Cybercrime-Brief-2026.pdf"],
+ ["Asia News Network: SG scam losses 1H 2026","https://asianews.network/?p=297011"],
+ ["ScamShield monthly bulletins 2026","https://www.scamshield.gov.sg/resources/scam-bulletins/"],
+ ["KnowBe4: ransomware record Q3 2026","https://blog.knowbe4.com/report-ransomware-attacks-hit-a-record-high-in-q3-2026"],
+ ["Sophos State of Ransomware 2026","https://assets.sophos.com/X24WTUEQ/at/jbww7pmb8n3gp99wr6hfq4/sophos-state-ransomware-report-2026.pdf"],
+ ["CISA/NSA/FBI on Volt Typhoon (ABC7)","https://abc7.com/chinese-hackers-spent-up-to-5-years-in-us-networks-cyber-officials/14400555/"]
+];
+
+/* ---------- State ---------- */
+const KEY="redflagrun.app.v1";
+const today=()=>{const d=new Date();return d.getFullYear()+"-"+(d.getMonth()+1)+"-"+d.getDate()};
+const dayDiff=(a,b)=>{const p=s=>{const[y,m,d]=s.split("-").map(Number);return Date.UTC(y,m-1,d)};return Math.round((p(b)-p(a))/864e5)};
+const DEFAULT={onboarded:false,age:"teens",region:"SG",goal:30,xp:0,hearts:5,streak:0,lastDay:null,daily:{day:"",xp:0},done:{},mistakes:[],large:false,sound:true,answered:0,correct:0,team:false,name:"",org:""};
+let S=Object.assign({},DEFAULT);
+try{const raw=localStorage.getItem(KEY);if(raw)S=Object.assign({},DEFAULT,JSON.parse(raw))}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function applyPrefs(){document.documentElement.classList.toggle("large",!!S.large)}
+// Streak breaks silently if a day was missed.
+if(S.lastDay&&dayDiff(S.lastDay,today())>1){S.streak=0;save()}
+
+/* ---------- Helpers ---------- */
+const app=document.getElementById("app");
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const h=html=>{const t=document.createElement("template");t.innerHTML=html.trim();return t.content.firstElementChild};
+const shuffle=a=>{a=a.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const pathUnits=()=>AGES[S.age].path;
+const lessonKey=(u,i)=>u+":"+i;
+function allLessons(){const out=[];pathUnits().forEach(u=>UNITS[u].lessons.forEach((l,i)=>out.push({u,i})));return out}
+function currentLesson(){return allLessons().find(l=>!S.done[lessonKey(l.u,l.i)])||null}
+function isUnlocked(u,i){const all=allLessons();const idx=all.findIndex(l=>l.u===u&&l.i===i);return idx===0||!!S.done[lessonKey(all[idx-1].u,all[idx-1].i)]||!!S.done[lessonKey(u,i)]}
+function vibrate(p){try{navigator.vibrate&&navigator.vibrate(p)}catch(e){}}
+let actx=null;
+function tone(ok){if(!S.sound)return;try{actx=actx||new (window.AudioContext||window.webkitAudioContext)();const o=actx.createOscillator(),g=actx.createGain();o.connect(g);g.connect(actx.destination);const t=actx.currentTime;
+ if(ok){o.frequency.setValueAtTime(660,t);o.frequency.setValueAtTime(880,t+.09)}else{o.frequency.setValueAtTime(220,t);o.frequency.setValueAtTime(160,t+.12)}
+ o.type=ok?"triangle":"square";g.gain.setValueAtTime(.0001,t);g.gain.exponentialRampToValueAtTime(ok?.18:.07,t+.02);g.gain.exponentialRampToValueAtTime(.0001,t+.28);o.start(t);o.stop(t+.3)}catch(e){}}
+
+/* ---------- Rank + shields ---------- */
+const THREAT={basics:1,game:1,msgs:2,money:2,feeds:3,work:3,ransom:4,nation:5};
+const RANKS=[[0,"Rookie"],[40,"Spotter"],[100,"Analyst"],[180,"Investigator"],[280,"Sentinel"],[400,"Guardian"]];
+function rankOf(xp){let i=0;RANKS.forEach((r,k)=>{if(xp>=r[0])i=k});const nx=RANKS[i+1];return{name:RANKS[i][1],pct:nx?Math.round(100*(xp-RANKS[i][0])/(nx[0]-RANKS[i][0])):100,next:nx?nx[1]:null,need:nx?nx[0]-xp:0}}
+function shields(){return `<span class="shields" role="img" aria-label="${S.hearts} of 5 shields" title="${S.hearts} of 5 shields">${[0,1,2,3,4].map(i=>`<i class="${i<S.hearts?"on":""}"></i>`).join("")}</span>`}
+const caseNo=()=>String(pathUnits().indexOf(R.u)+1).padStart(2,"0")+"-"+(R.li+1);
+
+/* ---------- Icons + mascot ---------- */
+const I={
+ flame:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c1 3.5 5 5.5 5 11a5 5 0 0 1-10 0c0-2.5 1.2-4 2.4-5.2.2 1.6 1 2.7 2.1 3.1C11 8.3 11.3 5 12 2z"/></svg>',
+ heart:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 21s-7.5-4.6-9.6-9.4C.9 8 3.2 4 7 4c2.1 0 3.6 1.1 5 3 1.4-1.9 2.9-3 5-3 3.8 0 6.1 4 4.6 7.6C19.5 16.4 12 21 12 21z"/></svg>',
+ bolt:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M13 2 4 14h7l-1 8 9-12h-7z"/></svg>',
+ star:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="m12 2.5 2.9 6 6.6.8-4.9 4.6 1.3 6.6L12 17.3l-5.9 3.2 1.3-6.6L2.5 9.3l6.6-.8z"/></svg>',
+ check:'<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" d="m5 12.5 4.5 4.5L19 7.5"/></svg>',
+ lock:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M7 10V8a5 5 0 0 1 10 0v2h1a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H6a1 1 0 0 1-1-1v-9a1 1 0 0 1 1-1zm2 0h6V8a3 3 0 0 0-6 0z"/></svg>',
+ shield:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2 4 5v6c0 5 3.4 9.5 8 11 4.6-1.5 8-6 8-11V5z"/></svg>',
+ x:'<svg viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" d="M6 6l12 12M18 6 6 18"/></svg>',
+ folder:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>',
+ target:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="4.8" fill="none" stroke="currentColor" stroke-width="2.4"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/></svg>',
+ badge:'<svg viewBox="0 0 24 24"><path fill="currentColor" fill-rule="evenodd" d="M5 3h14a1 1 0 0 1 1 1v16a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1zm7 4.2a2.8 2.8 0 1 0 0 5.6 2.8 2.8 0 0 0 0-5.6zM7.2 18h9.6c-.4-2.1-2.4-3.6-4.8-3.6S7.6 15.9 7.2 18z"/></svg>',
+ home:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 3 2 11h3v9h5v-6h4v6h5v-9h3z"/></svg>',
+ dumbbell:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 9h2V7h3v10H5v-2H3zm18 0h-2V7h-3v10h3v-2h2zM9 11h6v2H9z"/></svg>',
+ flag:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M5 2h2v20H5zm3 1h11l-3 4.5L19 12H8z"/></svg>',
+ user:'<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10zm0 2c-5 0-9 2.5-9 6v2h18v-2c0-3.5-4-6-9-6z"/></svg>',
+ sad:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M8 16c2.2-2 5.8-2 8 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="9" cy="10" r="1.4" fill="#fff"/><circle cx="15" cy="10" r="1.4" fill="#fff"/></svg>',
+ happy:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="currentColor"/><path d="M7.5 13.5c2.4 3 6.6 3 9 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/><circle cx="9" cy="9.5" r="1.4" fill="#fff"/><circle cx="15" cy="9.5" r="1.4" fill="#fff"/></svg>'
+};
+// Pip: original mascot — a little shield with a flag antenna.
+function pip(mood="happy",size=110){
+ const mouth=mood==="sad"?'<path d="M44 82c8-7 24-7 32 0" stroke="#3A120A" stroke-width="5" fill="none" stroke-linecap="round"/>'
+  :mood==="cheer"?'<path d="M40 72c6 16 34 16 40 0z" fill="#3A120A"/><path d="M48 80c6 5 18 5 24 0" fill="#FF8C7A"/>'
+  :'<path d="M44 74c8 9 24 9 32 0" stroke="#3A120A" stroke-width="5" fill="none" stroke-linecap="round"/>';
+ const eyes=mood==="cheer"?'<path d="M40 56q6-8 12 0M68 56q6-8 12 0" stroke="#3A120A" stroke-width="5" fill="none" stroke-linecap="round"/>'
+  :'<ellipse cx="46" cy="56" rx="8" ry="10" fill="#fff"/><ellipse cx="74" cy="56" rx="8" ry="10" fill="#fff"/><circle cx="48" cy="58" r="4.5" fill="#1B0B06"/><circle cx="76" cy="58" r="4.5" fill="#1B0B06"/>';
+ const arms=mood==="cheer"?'<path d="M18 64 6 46M102 64l12-18" stroke="#B92F18" stroke-width="8" stroke-linecap="round"/>':'';
+ return `<svg viewBox="0 0 120 130" width="${size}" height="${Math.round(size*130/120)}" role="img" aria-label="Pip the mascot">
+  ${arms}<path d="M60 4v20" stroke="#5A3A10" stroke-width="4" stroke-linecap="round"/><path d="M62 4h22l-6 7 6 7H62z" fill="#FFC83D" stroke="#5A3A10" stroke-width="2.5" stroke-linejoin="round"/>
+  <path d="M60 22 18 36v30c0 26 18 46 42 56 24-10 42-30 42-56V36z" fill="#F2462B" stroke="#B92F18" stroke-width="5" stroke-linejoin="round"/>
+  <path d="M60 30 28 41v24c0 10 3 19 9 27" stroke="#FF8C7A" stroke-width="6" fill="none" stroke-linecap="round" opacity=".7"/>
+  ${eyes}<circle cx="34" cy="70" r="6" fill="#FF8C7A" opacity=".8"/><circle cx="86" cy="70" r="6" fill="#FF8C7A" opacity=".8"/>${mouth}</svg>`;
+}
+
+/* ---------- Onboarding ---------- */
+let ob={step:0,age:null,region:null,goal:30};
+function renderOnboarding(){
+ app.innerHTML="";
+ const wrap=h(`<section class="ob slide"></section>`);
+ wrap.append(h(`<div class="ob-head"><div class="mono">Briefing ${ob.step+1} of 4</div><div class="prog">${[0,1,2,3].map(i=>`<i class="${i<=ob.step?"on":""}"></i>`).join("")}</div></div>`));
+ const handler=t=>h(`<div class="handler">${pip("happy",52)}<div><div class="mono">Pip · your handler</div><p>${esc(t)}</p></div></div>`);
+ const go=(label,enabled,fn,cls="")=>{const b=h(`<button class="btn ${cls}" ${enabled?"":"disabled"} style="margin-top:auto">${label}</button>`);b.onclick=fn;return b};
+ const pick=(arr,cur,grid,label,onPick)=>{const list=h(`<div class="choices ${grid?"grid2":""}" role="group" aria-label="${label}"></div>`);
+  arr.forEach(([k,em,t,sm])=>{const b=h(`<button class="choice" aria-pressed="${cur===k}"><span class="em">${em}</span><span>${esc(t)}${sm?`<small>${esc(sm)}</small>`:""}</span>${grid?"":`<span class="dot"></span>`}</button>`);b.onclick=()=>onPick(k);list.append(b)});return list};
+ if(ob.step===0){
+  wrap.append(h(`<div class="ob-hero"><div class="mono" style="color:var(--signal)">Red Flag Run</div><h1>Scams don't hack phones. They hack people.</h1><p class="muted">Short daily cases built from real scam reports. Learn to spot the red flag first, at any age, in any country.</p></div>`));
+  wrap.append(handler("I'm Pip. I'll brief you one case at a time. Five minutes a day is enough."));
+  wrap.append(go("Start briefing",true,()=>{ob.step=1;renderOnboarding()},"coral"));
+ } else if(ob.step===1){
+  wrap.append(handler("Who's training? I'll pick the right cases."));
+  wrap.append(pick(Object.entries(AGES).map(([k,a])=>[k,a.em,a.label,a.sub]),ob.age,false,"Who's training",k=>{ob.age=k;renderOnboarding()}));
+  wrap.append(go("Continue",!!ob.age,()=>{ob.step=2;renderOnboarding()}));
+ } else if(ob.step===2){
+  wrap.append(handler("Where do you live? I'll show you who to call if something goes wrong."));
+  wrap.append(pick(Object.entries(REGIONS).map(([k,r])=>[k,r.flag,r.name]),ob.region,true,"Country",k=>{ob.region=k;renderOnboarding()}));
+  wrap.append(go("Continue",!!ob.region,()=>{ob.step=3;renderOnboarding()}));
+ } else {
+  wrap.append(handler("How much time each day? You can change this later."));
+  wrap.append(pick([[15,"☕","Light","1 case a day · 15 XP"],[30,"👟","Steady","2 cases a day · 30 XP"],[60,"🏆","Intense","4 cases a day · 60 XP"]],ob.goal,false,"Daily goal",k=>{ob.goal=k;renderOnboarding()}));
+  wrap.append(go("Open my first case",true,()=>{Object.assign(S,{onboarded:true,age:ob.age,region:ob.region,goal:ob.goal,large:!!AGES[ob.age].large,team:!!AGES[ob.age].team});save();applyPrefs();const c=currentLesson();startLesson(c.u,c.i)},"coral"));
+ }
+ app.append(wrap);
+}
+
+/* ---------- Home shell ---------- */
+let tab="learn",sub=null;
+function topbar(){
+ const r=REGIONS[S.region],todayXp=S.daily.day===today()?S.daily.xp:0,pct=Math.min(1,todayXp/S.goal),C=2*Math.PI*9,rk=rankOf(S.xp);
+ return h(`<header class="topbar">
+  <button class="pill region" aria-label="Country: ${esc(r.name)}">${r.flag}</button>
+  <div class="rank" title="${rk.next?`${rk.need} XP to ${rk.next}`:"Top rank"}"><span class="rank-l">${rk.name}</span><span class="rank-bar"><i style="width:${rk.pct}%"></i></span></div>
+  <span class="pill streak" title="Days on watch">${I.flame}${S.streak}</span>
+  ${S.team?`<span class="pill mode" title="Team mode: no shields">Team</span>`:shields()}
+  <span class="pill" title="Today: ${todayXp} of ${S.goal} XP"><svg class="ring" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" fill="none" stroke="var(--sunk)" stroke-width="4"/><circle cx="12" cy="12" r="9" fill="none" stroke="var(--amber)" stroke-width="4" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-pct)}" transform="rotate(-90 12 12)"/></svg>${S.xp}</span>
+ </header>`);
+}
+function navbar(){
+ const items=[["learn","Cases",I.folder],["practice","Drills",I.target],["report","Report",I.flag],["me","Agent",I.badge]];
+ const n=h(`<nav class="nav"><div class="nav-in"></div></nav>`);
+ items.forEach(([k,l,ic])=>{const b=h(`<button ${tab===k?'aria-current="page"':""}><span class="ic">${ic}</span>${l}</button>`);b.onclick=()=>{tab=k;sub=null;renderHome();window.scrollTo({top:0})};n.firstChild.append(b)});
+ return n;
+}
+function renderHome(){
+ app.innerHTML="";
+ const tb=topbar();tb.querySelector(".region").onclick=()=>{tab="report";sub=null;renderHome()};
+ app.append(tb);
+ if(sub){(sub==="cert"?renderCert:renderPrivacy)();app.append(navbar());return}
+ ({learn:renderLearn,practice:renderPractice,report:renderReport,me:renderMe})[tab]();
+ app.append(navbar());
+}
+
+function renderLearn(){
+ const cur=currentLesson();
+ if(cur){
+  const U=UNITS[cur.u],L=U.lessons[cur.i],no=String(pathUnits().indexOf(cur.u)+1).padStart(2,"0");
+  const card=h(`<section class="next"><div class="tape" aria-hidden="true">RED FLAG · RED FLAG · RED FLAG</div><div class="mono">Next case · ${no}-${cur.i+1}</div><h1>${esc(L.name)}</h1><p>${esc(U.title)}: ${esc(U.sub)}</p></section>`);
+  const b=h(`<button class="btn coral">${Object.keys(S.done).length?"Open case":"Start your first case"}</button>`);b.onclick=()=>startLesson(cur.u,cur.i);card.append(b);app.append(card);
+ } else {
+  app.append(h(`<section class="next"><div class="mono">All cases closed</div><h1>Every dossier is closed.</h1><p>Keep your streak with Drills, or switch track in Agent for new cases.</p></section>`));
+ }
+ pathUnits().forEach((uid,ui)=>{
+  const U=UNITS[uid],no=String(ui+1).padStart(2,"0"),t=THREAT[uid]||1;
+  const closed=U.lessons.filter((_,li)=>S.done[lessonKey(uid,li)]).length;
+  const sec=h(`<section class="dossier"><header class="dos-h"><div class="dos-top"><span class="mono">Dossier ${no}</span><span class="threat" role="img" aria-label="Threat level ${t} of 5"><span class="mono">Threat</span>${[1,2,3,4,5].map(i=>`<i class="${i<=t?"on":""}"></i>`).join("")}</span></div><h2>${esc(U.title)}</h2><p>${esc(U.sub)}</p><div class="mono">${closed} of ${U.lessons.length} cases closed</div></header><ol class="cases"></ol></section>`);
+  U.lessons.forEach((L,li)=>{
+   const key=lessonKey(uid,li),done=S.done[key],open=isUnlocked(uid,li),isCur=cur&&cur.u===uid&&cur.i===li;
+   const st=done?"closed":open?"open":"sealed";
+   const meta=done?`${L.ex.length} exercises · ${done.acc}% first try`:open?`${L.ex.length} exercises · +10 XP`:"Close the case before to unlock";
+   const item=h(`<li><button class="case ${st} ${isCur?"cur":""}" ${open?"":"disabled"}><span class="case-no">${no}-${li+1}</span><span class="case-t">${esc(L.name)}<small>${meta}</small></span><span class="stamp">${done?"Closed":open?"Open":I.lock}</span></button></li>`);
+   if(open)item.firstChild.onclick=()=>startLesson(uid,li);
+   sec.querySelector(".cases").append(item);
+  });
+  app.append(sec);
+ });
+}
+
+function renderPractice(){
+ const n=S.mistakes.length;
+ app.append(h(`<h2 class="section-h">Drills</h2>`));
+ const p=h(`<div class="panel stack"><div class="row">${pip(S.hearts<5?"sad":"happy",72)}<div><b>${S.hearts<5?"Restore your shields":"Sharpen up"}</b><p class="muted small" style="margin:2px 0 0">Drills replay questions you missed and cases you've closed. They never cost shields, and finishing one restores all 5.</p></div></div></div>`);
+ const b=h(`<button class="btn sky">${n?`Review ${Math.min(n,8)} mistakes`:"Practise finished lessons"}</button>`);
+ const pool=practicePool();
+ if(!pool.length){b.disabled=true;b.textContent="Close a case first"}
+ b.onclick=()=>startPractice();
+ p.append(b);app.append(p);
+}
+
+function renderReport(){
+ const r=REGIONS[S.region];
+ app.append(h(`<h2 class="section-h">Report a scam</h2>`));
+ const p=h(`<div class="panel stack"></div>`);
+ p.append(h(`<div class="row"><span style="font-size:2rem">${r.flag}</span><div><b>${esc(r.name)}</b><div class="muted small">Official channels</div></div></div>`));
+ r.lines.forEach(l=>{const row=h(`<div class="hotline"><div><span class="muted small">${esc(l.label)}</span><b>${esc(l.value)}</b></div><button class="copy">Copy</button></div>`);
+  row.querySelector(".copy").onclick=async e=>{const btn=e.currentTarget;try{await navigator.clipboard.writeText(l.value);btn.textContent="Copied"}catch(err){const sel=getSelection(),rg=document.createRange();rg.selectNodeContents(row.querySelector("b"));sel.removeAllRanges();sel.addRange(rg);btn.textContent="Selected"}};p.append(row)});
+ r.links.forEach(l=>p.append(h(`<a href="${l.url}" target="_blank" rel="noopener" style="font-weight:800">${esc(l.label)} ↗</a>`)));
+ if(r.note)p.append(h(`<p class="muted small" style="margin:0">${esc(r.note)}</p>`));
+ if(r.emergency)p.append(h(`<p class="small" style="margin:0">In danger right now? Call <b>${r.emergency}</b>.</p>`));
+ app.append(p);
+ app.append(h(`<h2 class="section-h">Already sent money?</h2>`));
+ app.append(h(`<div class="panel"><ol class="steps"><li>Stop replying to the scammer.</li><li>Call your bank on the number on your card or official app. Ask them to stop or trace the payment.</li><li>Report it using the channels above.</li><li>Change passwords and turn on 2FA if you shared any login details.</li><li>Tell family and friends. It's not your fault, and talking helps stop the next scam.</li></ol></div>`));
+ const ch=h(`<button class="btn ghost" style="margin-top:14px">Change country</button>`);ch.onclick=()=>{tab="me";renderHome()};app.append(ch);
+}
+
+function renderMe(){
+ const lessons=Object.keys(S.done).length,acc=S.answered?Math.round(100*S.correct/S.answered):0;
+ app.append(h(`<div class="row" style="margin-top:18px">${pip("happy",72)}<div><h2 style="font-size:1.5rem">Agent file</h2><div class="mono" style="margin-top:2px">Rank: ${rankOf(S.xp).name}</div><div class="muted small">${AGES[S.age].em} ${AGES[S.age].label} track · ${REGIONS[S.region].flag} ${esc(REGIONS[S.region].name)}</div></div></div>`));
+ app.append(h(`<div class="stats" style="margin-top:14px">
+  <div class="stat" style="color:var(--coral)">${I.flame}<div><b style="color:var(--ink)">${S.streak}</b><span>Days on watch</span></div></div>
+  <div class="stat" style="color:var(--sun-d)">${I.bolt}<div><b style="color:var(--ink)">${S.xp}</b><span>Total XP</span></div></div>
+  <div class="stat" style="color:var(--good)">${I.check}<div><b style="color:var(--ink)">${lessons}/${allLessons().length}</b><span>Cases closed</span></div></div>
+  <div class="stat" style="color:var(--sky)">${I.star}<div><b style="color:var(--ink)">${acc}%</b><span>Accuracy</span></div></div></div>`));
+ const cb=h(`<button class="btn coral" style="margin-top:14px">${lessons===allLessons().length?"View my certificate":"Certificate preview"}</button>`);cb.onclick=()=>{sub="cert";renderHome();window.scrollTo({top:0})};app.append(cb);
+ app.append(h(`<h2 class="section-h">Settings</h2>`));
+ const p=h(`<div class="panel" style="padding-block:4px"></div>`);
+ const sel=(id,label,opts,val,on)=>{const r=h(`<div class="setting"><label for="${id}">${label}</label><select id="${id}">${opts.map(([v,l])=>`<option value="${v}" ${v==val?"selected":""}>${esc(l)}</option>`).join("")}</select></div>`);r.querySelector("select").onchange=e=>on(e.target.value);return r};
+ const sw=(label,val,on)=>{const r=h(`<div class="setting"><span>${label}</span><button class="switch" role="switch" aria-checked="${!!val}" aria-label="${label}"></button></div>`);r.querySelector(".switch").onclick=()=>on(!val);return r};
+ p.append(sel("age","Age track",Object.entries(AGES).map(([k,a])=>[k,`${a.label} (${a.sub})`]),S.age,v=>{S.age=v;S.team=!!AGES[v].team;save();renderHome()}));
+ p.append(sel("region","Country",Object.entries(REGIONS).map(([k,r])=>[k,`${r.flag} ${r.name}`]),S.region,v=>{S.region=v;save();renderHome()}));
+ p.append(sel("goal","Daily goal",[[15,"Casual · 15 XP"],[30,"Regular · 30 XP"],[60,"Serious · 60 XP"]],S.goal,v=>{S.goal=+v;save();renderHome()}));
+ p.append(sw("Large text",S.large,v=>{S.large=v;save();applyPrefs();renderHome()}));
+ p.append(sw("Sound effects",S.sound,v=>{S.sound=v;save();renderHome()}));
+ p.append(sw("Team mode (no shields)",S.team,v=>{S.team=v;save();renderHome()}));
+ app.append(p);
+ const reset=h(`<button class="btn ghost" style="margin-top:14px;color:var(--bad)">Reset progress</button>`);
+ reset.onclick=()=>modal({mood:"sad",title:"Reset all progress?",body:"Your streak, XP and finished lessons will be cleared on this device.",primary:["Yes, reset","bad",()=>{S=Object.assign({},DEFAULT);save();applyPrefs();ob={step:0,age:null,region:null,goal:30};renderOnboarding()}],secondary:["Keep my progress",()=>{}]});
+ app.append(reset);
+ const pv=h(`<button class="btn ghost" style="margin-top:12px">Privacy & disclaimer</button>`);pv.onclick=()=>{sub="privacy";renderHome();window.scrollTo({top:0})};app.append(pv);
+ app.append(h(`<div class="panel stack" style="margin-top:18px"><b>About this MVP</b><p class="muted small" style="margin:0">Red Flag Run aims to give everyone cyber security awareness, whatever their age and wherever they live. Lessons are built from public reports up to 29 Oct 2026.</p>
+  <div class="small">${SOURCES.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(l)}</a>`).join(" · ")}</div></div>`));
+}
+
+/* ---------- Certificate ---------- */
+function backRow(){const b=h(`<button class="btn ghost" style="margin-top:16px">Back to profile</button>`);b.onclick=()=>{sub=null;renderHome();window.scrollTo({top:0})};return b}
+function renderCert(){
+ const total=allLessons().length,done=allLessons().filter(l=>S.done[lessonKey(l.u,l.i)]).length,complete=done===total;
+ const acc=S.answered?Math.round(100*S.correct/S.answered):0;
+ const d=new Date().toLocaleDateString(undefined,{day:"numeric",month:"long",year:"numeric"});
+ app.append(h(`<h2 class="section-h">Certificate</h2>`));
+ const form=h(`<div class="panel stack"><label class="small" for="cert-name">Name on certificate</label><input id="cert-name" class="field" maxlength="40" placeholder="Your name" value="${esc(S.name)}">
+  <label class="small" for="cert-org">Organisation or school (optional)</label><input id="cert-org" class="field" maxlength="50" placeholder="e.g. Acme Pte Ltd" value="${esc(S.org)}"></div>`);
+ app.append(form);
+ const card=h(`<div class="cert ${complete?"":"preview"}"></div>`);
+ const draw=()=>{card.innerHTML=`${complete?"":`<div class="wm">PREVIEW</div>`}
+  <div class="cert-top">${pip("cheer",64)}<div><div class="cert-brand">Red Flag Run</div><div class="cert-kicker">Cyber safety awareness</div></div></div>
+  <div class="cert-label">Certificate of completion</div>
+  <div class="cert-name">${esc(S.name||"Your name")}</div>
+  ${S.org?`<div class="cert-org">${esc(S.org)}</div>`:""}
+  <p class="cert-body">has completed the <b>${esc(AGES[S.age].label)}</b> track: ${total} lessons on scams, phishing, social engineering${AGES[S.age].path.includes("ransom")?", ransomware":""} and how to report them.</p>
+  <div class="cert-meta"><div><span>Lessons</span><b>${done}/${total}</b></div><div><span>Accuracy</span><b>${acc}%</b></div><div><span>Date</span><b>${complete?esc(d):"—"}</b></div></div>`};
+ draw();
+ form.querySelector("#cert-name").oninput=e=>{S.name=e.target.value;save();draw()};
+ form.querySelector("#cert-org").oninput=e=>{S.org=e.target.value;save();draw()};
+ app.append(card);
+ app.append(h(`<p class="muted small" style="margin:10px 2px 0">${complete?"Take a screenshot to share it or send it to your manager or teacher.":`Finish ${total-done} more lesson${total-done===1?"":"s"} on the ${esc(AGES[S.age].label)} track to earn it.`}</p>`));
+ app.append(backRow());
+}
+function renderPrivacy(){
+ app.append(h(`<h2 class="section-h">Privacy & disclaimer</h2>`));
+ app.append(h(`<div class="panel stack small">
+  <b style="font-size:1rem">Your privacy</b>
+  <ul class="steps" style="padding-left:1.1rem;margin:0">
+   <li>No account is needed. Your progress, name and settings are stored only on this device.</li>
+   <li>We don't collect, sell or share personal data. There are no ads and no tracking.</li>
+   <li>When you're online, the app loads its fonts from Google Fonts, which can see your device's IP address.</li>
+   <li>Links to sources and reporting sites open in your browser, under those sites' own privacy policies.</li>
+   <li>Reset progress in Profile deletes everything the app stored.</li>
+  </ul>
+  <b style="font-size:1rem">Disclaimer</b>
+  <p style="margin:0">Red Flag Run is for education only. It isn't legal, financial or security advice. Hotlines and statistics were checked against public sources on 30 Oct 2026 and can change, so confirm with the official site for your country. If you're in danger or have lost money, contact your bank and the police straight away.</p>
+  <b style="font-size:1rem">Contact</b>
+  <p style="margin:0">hello@[your-domain] <span class="muted">(placeholder: replace before publishing)</span></p>
+  <p style="margin:0"><a href="/privacy" target="_blank" rel="noopener">Full privacy policy</a></p>
+ </div>`));
+ app.append(backRow());
+}
+
+/* ---------- Modal ---------- */
+function modal({mood,title,body,primary,secondary}){
+ const m=h(`<div class="scrim" role="dialog" aria-modal="true"><div class="sheet slide">${pip(mood,90)}<h2>${esc(title)}</h2><p class="muted" style="margin:0">${esc(body)}</p></div></div>`);
+ const s=m.querySelector(".sheet");
+ if(primary){const b=h(`<button class="btn ${primary[1]}">${esc(primary[0])}</button>`);b.onclick=()=>{m.remove();primary[2]()};s.append(b)}
+ if(secondary){const b=h(`<button class="btn ghost">${esc(secondary[0])}</button>`);b.onclick=()=>{m.remove();secondary[1]()};s.append(b)}
+ document.body.append(m);s.querySelector("button")?.focus();
+}
+
+/* ---------- Lesson engine ---------- */
+let R=null; // run: {mode, unit, li, queue, total, cleared, wrong, earned}
+function regionExercise(){
+ const me=REGIONS[S.region];
+ if(S.region==="GL")return C("You've just been scammed. What's the best first move?",["Post about it online","Call your bank on its official number, then report to local police","Wait a week to see","Message the scammer to ask for the money back"],1,"Banks can sometimes stop a transfer if they hear fast. Then report it so police can act.","Act fast");
+ const others=shuffle(Object.keys(REGIONS).filter(k=>k!==S.region&&k!=="GL")).slice(0,3).map(k=>REGIONS[k].short);
+ const opts=shuffle([me.short,...others]);
+ return C(`You live in ${me.name}. Where do you check or report a scam?`,opts,opts.indexOf(me.short),`In ${me.name}, use ${me.short}. Save it in your phone now. You'll find it any time in the Report tab.`,"Know who to call");
+}
+function prep(ex,id){let base=ex.t==="region"?regionExercise():(ex.sgOnly&&S.region!=="SG"?ex.alt:ex);return Object.assign({},base,{id,src:base===ex?SRCMAP[id]:null})}
+function startLesson(u,li){
+ if(!S.team&&S.hearts<=0){outOfHearts();return}
+ const ex=UNITS[u].lessons[li].ex.map((e,i)=>prep(e,`${u}:${li}:${i}`));
+ R={mode:"lesson",u,li,queue:ex,total:ex.length,cleared:0,wrong:0,firstTry:0,seen:new Set()};
+ renderEx();
+}
+function practicePool(){
+ const ids=new Set(S.mistakes);
+ Object.keys(S.done).forEach(k=>{const[u,li]=k.split(":");UNITS[u]?.lessons[+li]?.ex.forEach((e,i)=>ids.add(`${u}:${li}:${i}`))});
+ return [...ids].filter(id=>{const[u,li,i]=id.split(":");return UNITS[u]?.lessons[+li]?.ex[+i]});
+}
+function startPractice(){
+ const mist=shuffle(S.mistakes.filter(id=>practicePool().includes(id))).slice(0,8);
+ const rest=shuffle(practicePool().filter(id=>!mist.includes(id)));
+ const ids=mist.concat(rest).slice(0,Math.max(5,Math.min(8,mist.length||5)));
+ const ex=ids.map(id=>{const[u,li,i]=id.split(":");return prep(UNITS[u].lessons[+li].ex[+i],id)});
+ if(!ex.length){tab="practice";renderHome();return}
+ R={mode:"practice",queue:ex,total:ex.length,cleared:0,wrong:0,firstTry:0,seen:new Set()};
+ renderEx();
+}
+function quitLesson(){
+ modal({mood:"sad",title:"Leave this case?",body:"Your progress in this case won't be saved.",primary:["Keep going","",()=>{}],secondary:["Leave case",()=>{R=null;tab="learn";renderHome()}]});
+}
+function outOfHearts(){
+ modal({mood:"sad",title:"Shields down",body:"A quick drill restores all 5 shields and never costs any.",primary:["Run a drill","coral",()=>{R=null;startPractice()}],secondary:["Back to cases",()=>{R=null;tab="learn";renderHome()}]});
+}
+
+const KIND={choice:"Choose the answer",spot:"Scam or legit?",flags:"Spot the red flags",match:"Match the pairs",order:"Put in order"};
+let pick=null; // current selection state
+function renderEx(){
+ const ex=R.queue[0];pick=null;
+ app.innerHTML="";
+ const top=h(`<div class="lesson-top"><button class="x" aria-label="Leave case">${I.x}</button><div class="prog" role="progressbar" aria-valuemin="0" aria-valuemax="${R.total}" aria-valuenow="${R.cleared}">${Array.from({length:R.total},(_,i)=>`<i class="${i<R.cleared?"on":""}"></i>`).join("")}</div>${R.mode==="practice"?`<span class="pill mode">Drill</span>`:S.team?`<span class="pill mode">Team</span>`:shields()}</div>`);
+ top.querySelector(".x").onclick=quitLesson;app.append(top);
+ const body=h(`<section class="slide" style="padding-bottom:min(55vh,320px)"></section>`);
+ if(R.seen.has(ex.id))body.append(h(`<div class="practice-tag">Second look</div>`));
+ body.append(h(`<div class="ex-kind mono">${R.mode==="lesson"?`Case ${caseNo()} · `:"Drill · "}${KIND[ex.t]}</div>`));
+ body.append(h(`<h1 class="ex-q">${esc(ex.q==="Scam or legit?"?"Is this message a scam?":ex.q)}</h1>`));
+ const foot=h(`<div class="footer"><div class="footer-in"><button class="btn" disabled id="check">Lock in answer</button></div></div>`);
+ const check=foot.querySelector("#check");
+ const ready=v=>{check.disabled=!v};
+
+ if(ex.msg&&ex.t!=="flags")body.append(h(`<div class="msg"><div class="msg-h"><b>${esc(ex.msg.from)}</b><span>${esc(ex.msg.ch)}</span></div><div class="bubble">${esc(ex.msg.text)}</div></div>`));
+
+ if(ex.t==="choice"||ex.t==="spot"){
+  const wrap=h(`<div class="opts ${ex.t==="spot"?"duo":""}" role="radiogroup"></div>`);
+  ex.opts.forEach((o,i)=>{const b=h(ex.t==="spot"?`<button class="opt" role="radio" aria-pressed="false"><span class="em">${i===0?"🚩":"✅"}</span>${esc(o)}</button>`:`<button class="opt" role="radio" aria-pressed="false"><span class="k">${i+1}</span><span>${esc(o)}</span></button>`);
+   b.onclick=()=>{[...wrap.children].forEach(c=>c.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");pick=i;ready(true)};wrap.append(b)});
+  body.append(wrap);
+  check.onclick=()=>{const ok=pick===ex.a;[...wrap.children].forEach((c,i)=>{c.disabled=true;if(i===ex.a)c.classList.add("ok");else if(i===pick)c.classList.add("no")});
+   feedback(ok,ok?null:ex.opts[ex.a],foot)};
+ }
+ else if(ex.t==="flags"){
+  body.append(h(`<p class="hint">Tap every part that looks suspicious, then check.</p>`));
+  body.append(h(`<div class="msg-h" style="padding:0 4px"><b>${esc(ex.msg.from)}</b><span>${esc(ex.msg.ch)}</span></div>`));
+  const wrap=h(`<div class="segs"></div>`);pick=new Set();
+  ex.segs.forEach((s,i)=>{const b=h(`<button class="seg" aria-pressed="false">${esc(s.text)}</button>`);b.onclick=()=>{pick.has(i)?pick.delete(i):pick.add(i);b.setAttribute("aria-pressed",pick.has(i));ready(pick.size>0)};wrap.append(b)});
+  body.append(wrap);
+  check.onclick=()=>{let ok=true;[...wrap.children].forEach((c,i)=>{c.disabled=true;const f=ex.segs[i].flag,p=pick.has(i);
+    if(f&&p)c.classList.add("hit");else if(!f&&p){c.classList.add("miss");ok=false}else if(f&&!p){c.classList.add("missed");ok=false}});
+   feedback(ok,ok?null:"Yellow = flags you missed, red = parts that were actually fine.",foot,true)};
+ }
+ else if(ex.t==="match"){
+  const L=shuffle(ex.pairs.map((p,i)=>({i,t:p[0]}))),Rr=shuffle(ex.pairs.map((p,i)=>({i,t:p[1]})));
+  const grid=h(`<div class="match"><div class="col"></div><div class="col"></div></div>`);
+  let selL=null,selR=null,matched=0,slips=0;
+  const mk=(item,side)=>{const b=h(`<button class="tile" aria-pressed="false">${esc(item.t)}</button>`);b.dataset.i=item.i;b.dataset.side=side;
+   b.onclick=()=>{if(b.classList.contains("matched"))return;
+    const col=b.parentElement;[...col.children].forEach(c=>c.setAttribute("aria-pressed","false"));b.setAttribute("aria-pressed","true");
+    if(side==="L")selL=b;else selR=b;
+    if(selL&&selR){if(selL.dataset.i===selR.dataset.i){[selL,selR].forEach(x=>{x.classList.add("matched");x.setAttribute("aria-pressed","false");x.disabled=true});matched++;tone(true);vibrate(15);
+       if(matched===ex.pairs.length){S.answered++;S.correct++;feedback(true,null,foot,false,slips)}}
+     else{const a=selL,c=selR;[a,c].forEach(x=>{x.classList.add("shake");x.setAttribute("aria-pressed","false")});slips++;tone(false);vibrate(40);setTimeout(()=>[a,c].forEach(x=>x.classList.remove("shake")),320)}
+     selL=selR=null}};return b};
+  L.forEach(x=>grid.children[0].append(mk(x,"L")));Rr.forEach(x=>grid.children[1].append(mk(x,"R")));
+  body.append(grid);check.textContent="Match all pairs";
+ }
+ else if(ex.t==="order"){
+  body.append(h(`<p class="hint">Tap the steps in the right order. Tap a placed step to remove it.</p>`));
+  const ans=h(`<div class="answer-row"></div>`),bank=h(`<div class="bank"></div>`);pick=[];
+  const items=shuffle(ex.steps.map((t,i)=>({t,i})));
+  const draw=()=>{ans.innerHTML="";pick.forEach((it,pos)=>{const b=h(`<button class="chipbtn"><span class="n">${pos+1}</span>${esc(it.t)}</button>`);b.onclick=()=>{pick.splice(pos,1);draw()};ans.append(b)});
+   [...bank.children].forEach(b=>b.classList.toggle("used",pick.some(p=>p.i==b.dataset.i)));ready(pick.length===ex.steps.length)};
+  items.forEach(it=>{const b=h(`<button class="chipbtn">${esc(it.t)}</button>`);b.dataset.i=it.i;b.onclick=()=>{if(!pick.includes(it)){pick.push(it);draw()}};bank.append(b)});
+  body.append(ans);body.append(bank);
+  check.onclick=()=>{const ok=pick.every((p,pos)=>p.i===pos);[...ans.children,...bank.children].forEach(b=>b.disabled=true);
+   feedback(ok,ok?null:ex.steps.map((s,i)=>`${i+1}. ${s}`).join("  "),foot)};
+ }
+ app.append(body);app.append(foot);
+}
+
+function feedback(ok,answerText,foot,isFlags,slips){
+ const ex=R.queue[0];
+ if(ex.t!=="match"){S.answered++;if(ok)S.correct++}
+ if(ok){tone(true);vibrate(20)}else{tone(false);vibrate([40,40,40])}
+ if(ok){R.cleared++;if(!R.seen.has(ex.id))R.firstTry++;S.mistakes=S.mistakes.filter(id=>id!==ex.id);R.queue.shift()}
+ else{R.wrong++;R.seen.add(ex.id);if(!S.mistakes.includes(ex.id))S.mistakes.push(ex.id);R.queue.push(R.queue.shift());if(R.mode==="lesson"&&!S.team)S.hearts=Math.max(0,S.hearts-1)}
+ save();
+ const sh=document.querySelector(".lesson-top .shields");if(sh)sh.outerHTML=shields();
+ const pg=document.querySelector(".lesson-top .prog");if(pg){[...pg.children].forEach((x,i)=>x.classList.toggle("on",i<R.cleared));pg.setAttribute("aria-valuenow",R.cleared)}
+ foot.className="footer slide "+(ok?"ok":"no");
+ const stamp=ok?(ex.t==="spot"&&ex.a===0?"Scam spotted":ex.t==="spot"?"Cleared":ex.t==="flags"?"All flagged":slips?"Matched":"Correct"):(ex.t==="spot"?"Fooled":"Missed");
+ foot.firstChild.innerHTML=`<div class="fb-h"><span class="vstamp">${stamp}</span>${ex.flag?`<span class="fb-flag">${esc(ex.flag)}</span>`:""}</div>
+  <div class="fb-body">${!ok&&answerText&&!isFlags?`<b>Answer:</b> ${esc(answerText)}<br>`:""}${!ok&&isFlags?`<span class="muted">${esc(answerText)}</span><br>`:""}${esc(ex.why)}${ex.src&&SRC[ex.src]?`<div class="small" style="margin-top:6px">Source: <a href="${SRC[ex.src][1]}" target="_blank" rel="noopener">${esc(SRC[ex.src][0])}</a></div>`:""}</div>`;
+ const next=h(`<button class="btn ${ok?"":"bad"}">${ok?"Next":"Got it"}</button>`);
+ next.onclick=()=>{if(R.mode==="lesson"&&!S.team&&S.hearts<=0&&R.queue.length){outOfHearts();return}R.queue.length?renderEx():finish()};
+ foot.firstChild.append(next);next.focus({preventScroll:true});
+}
+
+function finish(){
+ const perfect=R.wrong===0,acc=Math.round(100*R.firstTry/R.total);
+ const earned=R.mode==="lesson"?(S.done[lessonKey(R.u,R.li)]?5:10)+(perfect?5:0):10;
+ const before=rankOf(S.xp);
+ if(R.mode==="practice")S.hearts=5;
+ if(R.mode==="lesson")S.done[lessonKey(R.u,R.li)]={acc};
+ S.xp+=earned;
+ const t=today();if(S.daily.day!==t)S.daily={day:t,xp:0};S.daily.xp+=earned;
+ let streakUp=false;if(S.lastDay!==t){S.streak=(S.lastDay&&dayDiff(S.lastDay,t)===1)?S.streak+1:1;S.lastDay=t;streakUp=true}
+ save();
+ const rk=rankOf(S.xp),goalHit=S.daily.xp>=S.goal&&S.daily.xp-earned<S.goal;
+ const notes=[];
+ if(R.mode==="practice")notes.push("All 5 shields restored.");
+ if(streakUp)notes.push(S.streak===1?"Day 1 on watch. Come back tomorrow to keep it going.":`${S.streak} days on watch in a row.`);
+ if(goalHit)notes.push("Daily goal reached.");
+ if(rk.name!==before.name)notes.push(`Promoted to ${rk.name}.`);
+ const title=R.mode==="lesson"?UNITS[R.u].lessons[R.li].name:"Mixed drill";
+ app.innerHTML="";
+ app.append(h(`<section class="done-screen slide">
+  <div class="big-stamp ${perfect?"perfect":""}">${R.mode==="practice"?"Drill done":perfect?"Solved clean":"Case closed"}</div>
+  <div class="report">
+   <div class="report-h">${pip("cheer",56)}<div><div class="mono">${R.mode==="lesson"?`Case report · ${caseNo()}`:"Drill report"}</div><b>${esc(title)}</b></div></div>
+   <dl class="rows">
+    <div><dt>XP earned</dt><dd>+${earned}</dd></div>
+    <div><dt>First-try accuracy</dt><dd>${acc}%</dd></div>
+    <div><dt>Days on watch</dt><dd>${S.streak}</dd></div>
+    <div><dt>Rank</dt><dd>${rk.name}</dd></div>
+   </dl>
+  </div>
+  ${notes.length?`<div class="done-notes">${notes.map(n=>`<p class="muted" style="margin:0">${esc(n)}</p>`).join("")}</div>`:""}
+ </section>`));
+ const foot=h(`<div class="footer"><div class="footer-in"></div></div>`);
+ const nxt=currentLesson();
+ if(R.mode==="lesson"&&!nxt){const c=h(`<button class="btn coral">View my certificate</button>`);c.onclick=()=>{R=null;sub="cert";tab="me";renderHome()};foot.firstChild.append(c)}
+ if(R.mode==="lesson"&&nxt&&(S.team||S.hearts>0)){const b=h(`<button class="btn coral">Open next case</button>`);b.onclick=()=>startLesson(nxt.u,nxt.i);foot.firstChild.append(b)}
+ const back=h(`<button class="btn ghost">Back to cases</button>`);back.onclick=()=>{R=null;tab="learn";renderHome();window.scrollTo({top:0})};foot.firstChild.append(back);
+ app.append(foot);
+ R=null;
+}
+
+/* ---------- Android back button hook (called by the native shell) ---------- */
+window.rfrBack=function(){
+ const m=document.querySelector(".scrim");if(m){m.remove();return true}
+ if(R){quitLesson();return true}
+ if(document.querySelector(".done-screen")){tab="learn";renderHome();return true}
+ if(!S.onboarded&&ob.step>0){ob.step--;renderOnboarding();return true}
+ if(sub){sub=null;renderHome();return true}
+ if(S.onboarded&&tab!=="learn"){tab="learn";renderHome();return true}
+ return false;
+};
+
+/* ---------- Boot ---------- */
+applyPrefs();
+if(S.onboarded)renderHome();else renderOnboarding();
+</script>
+<script>
+if("serviceWorker" in navigator && location.protocol==="https:"){addEventListener("load",()=>{navigator.serviceWorker.register("/sw.js").catch(()=>{})})}
+</script>
+</body></html>

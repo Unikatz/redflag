@@ -1,0 +1,6 @@
+<resources>
+    <style name="Theme.RedFlagRun" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/brand_bg</item>
+        <item name="android:colorAccent">@color/brand_coral</item>
+    </style>
+</resources>

@@ -1,0 +1,37 @@
+{
+  "name": "Red Flag Run",
+  "short_name": "Red Flag Run",
+  "description": "Short daily cases that teach you to spot scams, from fake parcel texts to ransomware. Free, no ads, no tracking. For every age, in every country.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#EEF1F6",
+  "theme_color": "#161B33",
+  "categories": [
+    "education",
+    "security"
+  ],
+  "lang": "en",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
